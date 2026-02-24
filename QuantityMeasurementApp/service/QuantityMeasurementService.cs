@@ -1,32 +1,22 @@
-using System;
+
+using System.Security.Cryptography.X509Certificates;
 using QuantityMeasurementApp.models;
 
-namespace QuantityMeasurementApp.service{
+
+// Provides comparison services for different measurements.
+public class QuantityMeasurementService
+{   
     /// <summary>
-    /// Provides operations related to measurement comparisons.
+    /// Compares two Quantity objects. 
+    /// The conversion math is handled internally by the Quantity model.
     /// </summary>
-    public class QuantityMeasurementService
+    public bool Compare(Quantity q1,Quantity q2)
     {
-        /// <summary>
-        /// Checks whether two Feet objects hold identical values.
-        /// </summary>
-        public bool AreFeetEqual(Feet firstValue, Feet secondValue)
+        if(q1 == null || q2 == null)
         {
-            if (firstValue is null || secondValue is null)
-                throw new ArgumentNullException("Feet inputs cannot be null.");
-
-            return firstValue.Equals(secondValue);
+            return false;
         }
 
-        /// <summary>
-        /// Checks whether two Inches objects hold identical values.
-        /// </summary>
-        public bool AreInchesEqual(Inches leftValue, Inches rightValue)
-        {
-            if (leftValue is null || rightValue is null)
-                throw new ArgumentNullException("Inches inputs cannot be null.");
-
-            return leftValue.Equals(rightValue);
-        }
+        return q1.Equals(q2);
     }
 }
