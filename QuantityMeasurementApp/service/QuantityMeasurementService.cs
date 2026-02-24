@@ -1,22 +1,32 @@
 using System;
 using QuantityMeasurementApp.models;
 
-namespace QuantityMeasurementApp.service
-{
+namespace QuantityMeasurementApp.service{
     /// <summary>
-    /// Handles comparison logic for measurement entities.
+    /// Provides operations related to measurement comparisons.
     /// </summary>
     public class QuantityMeasurementService
     {
         /// <summary>
-        /// Determines whether two Feet instances represent the same value.
+        /// Checks whether two Feet objects hold identical values.
         /// </summary>
-        public bool CompareFeet(Feet left, Feet right)
+        public bool AreFeetEqual(Feet firstValue, Feet secondValue)
         {
-            if (left is null || right is null)
-                throw new ArgumentNullException("Feet objects cannot be null");
+            if (firstValue is null || secondValue is null)
+                throw new ArgumentNullException("Feet inputs cannot be null.");
 
-            return left.Equals(right);
+            return firstValue.Equals(secondValue);
+        }
+
+        /// <summary>
+        /// Checks whether two Inches objects hold identical values.
+        /// </summary>
+        public bool AreInchesEqual(Inches leftValue, Inches rightValue)
+        {
+            if (leftValue is null || rightValue is null)
+                throw new ArgumentNullException("Inches inputs cannot be null.");
+
+            return leftValue.Equals(rightValue);
         }
     }
 }

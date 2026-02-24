@@ -33,6 +33,10 @@ public class QuantityMeasurementAppMenu
             }
             else if (input == "2")
             {
+                HandleInchesComparison();
+            }
+            else if (input == "3")
+            {
                 break;
             }
             else
@@ -45,28 +49,23 @@ public class QuantityMeasurementAppMenu
     private void DisplayOptions()
     {
         Console.WriteLine("1. Compare Feet Equality");
-        Console.WriteLine("2. Exit");
+        Console.WriteLine("2. Compare Inches Equality");
+        Console.WriteLine("3. Exit");
     }
 
-    /// <summary>
-    /// Collects input values, creates Feet instances,
-    /// and compares them using service layer.
-    /// </summary>
     private void HandleFeetComparison()
     {
         try
         {
-            double first = ReadFeetValue("Enter first value in feet: ");
-            double second = ReadFeetValue("Enter second value in feet: ");
+            double first = ReadNumericValue("Enter first value in feet: ");
+            double second = ReadNumericValue("Enter second value in feet: ");
 
             Feet firstFeet = new Feet(first);
             Feet secondFeet = new Feet(second);
 
-            bool result = _measurementService.CompareFeet(firstFeet, secondFeet);
+            bool result = _measurementService.AreFeetEqual(firstFeet, secondFeet);
 
-            Console.WriteLine(result
-                ? "The Measurement are Equal"
-                : "The Measurement are not Equal");
+            DisplayComparisonResult(result);
         }
         catch (FormatException formatError)
         {
@@ -78,9 +77,40 @@ public class QuantityMeasurementAppMenu
         }
     }
 
-    private double ReadFeetValue(string prompt)
+    private void HandleInchesComparison()
+    {
+        try
+        {
+            double first = ReadNumericValue("Enter first value in inches: ");
+            double second = ReadNumericValue("Enter second value in inches: ");
+
+            Inches firstInches = new Inches(first);
+            Inches secondInches = new Inches(second);
+
+            bool result = _measurementService.AreInchesEqual(firstInches, secondInches);
+
+            DisplayComparisonResult(result);
+        }
+        catch (FormatException formatError)
+        {
+            Console.WriteLine("Format Exception " + formatError.Message);
+        }
+        catch (Exception generalError)
+        {
+            Console.WriteLine("General Exception: " + generalError.Message);
+        }
+    }
+
+    private double ReadNumericValue(string prompt)
     {
         Console.Write(prompt);
         return Convert.ToDouble(Console.ReadLine());
+    }
+
+    private void DisplayComparisonResult(bool isEqual)
+    {
+        Console.WriteLine(isEqual
+            ? "The Measurement are Equal"
+            : "The Measurement are not Equal");
     }
 }
