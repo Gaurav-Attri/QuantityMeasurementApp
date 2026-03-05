@@ -1,22 +1,20 @@
-
 using System.Security.Cryptography.X509Certificates;
 using QuantityMeasurementApp.models;
 
-
-// Provides comparison services for different measurements.
+// Handles operations related to comparing measurement quantities.
 public class QuantityMeasurementService
-{   
+{
     /// <summary>
-    /// Compares two Quantity objects. 
-    /// The conversion math is handled internally by the Quantity model.
+    /// Checks whether two Quantity objects represent the same measurement.
+    /// Actual unit conversion is managed inside the Quantity class.
     /// </summary>
-    public bool Compare(Quantity q1,Quantity q2)
+    public bool Compare(Quantity firstQuantity, Quantity secondQuantity)
     {
-        if(q1 == null || q2 == null)
+        if (firstQuantity == null || secondQuantity == null)
         {
             return false;
         }
 
-        return q1.Equals(q2);
+        return firstQuantity.Equals(secondQuantity);
     }
 }

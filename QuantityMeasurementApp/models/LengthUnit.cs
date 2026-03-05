@@ -1,45 +1,62 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Lists the available measurement units.
-    /// The order matters: position 0 represents Inches, position 1 represents Feet.
+    /// Lists all the length units supported in the application.
+    /// The order of the units matters because it matches the
+    /// position used in the conversion array.
     /// </summary>
     public enum LengthUnit
     {
-        Inches,
-        Feet
+        Inches,     
+        Feet,       
+        Yards,      
+        Centimeters 
     }
 
     /// <summary>
-    /// Contains utility functions for the LengthUnit enum to keep all conversion logic in one place.
+    /// Contains utility methods related to the LengthUnit enum,
+    /// mainly used for conversion and displaying unit symbols.
     /// </summary>
-    public static class LengthUnitHelper
+    public static class LengthUnitExtensions
     {
-        // Base Unit: Inches
-        // Table: Maps the enum index to its multiplier for the base unit.
-        private static readonly double[] ToInchesFactor = {1.0, 12.0};
-
-        // <summary>
-        /// Returns the multiplier needed to convert the unit to the base unit.
-        /// </summary>
-        public static double GetConversionFactor(this LengthUnit unit)
+        // Conversion values used to convert each unit to inches
+        private static readonly double[] conversionValues =
         {
-            return ToInchesFactor[(int)unit];
+            1.0,        // Inches
+            12.0,       // Feet (1 ft = 12 inches)
+            36.0,       // Yards (1 yd = 36 inches)
+            0.393701    // Centimeters (1 cm ≈ 0.393701 inches)
+        };
+
+        /// <summary>
+        /// Returns the conversion value for the given unit.
+        /// </summary>
+        public static double GetConversionFactor(this LengthUnit lengthType)
+        {
+            return conversionValues[(int)lengthType];
         }
 
-        // Returns the symbol for the unit for displaying on the console.
-        public static string GetSymbol(this LengthUnit unit)
+        /// <summary>
+        /// Returns the short symbol used to represent the unit.
+        /// </summary>
+        public static string GetSymbol(this LengthUnit lengthType)
         {
-            switch (unit)
+            switch (lengthType)
             {
                 case LengthUnit.Feet:
-                    return "feet";
-                
+                    return "ft";
+
                 case LengthUnit.Inches:
-                    return "inches";
+                    return "in";
+
+                case LengthUnit.Yards:
+                    return "yd";
+
+                case LengthUnit.Centimeters:
+                    return "cm";
 
                 default:
-                    return unit.ToString().ToLower();
+                    return lengthType.ToString().ToLower();
             }
         }
     }
