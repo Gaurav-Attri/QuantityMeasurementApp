@@ -5,79 +5,121 @@ using System.Runtime.CompilerServices;
 using QuantityMeasurementApp.models;
 
 /// <summary>
-/// Console menu controller for the quantity measurement program.
-/// It displays options and directs the user to conversion or comparison tasks.
+/// Console menu for interacting with the quantity measurement system.
+/// It allows the user to convert units, compare values, or perform addition.
 /// </summary>
 public class QuantityMeasurementAppMenu
 {
-    private QuantityMeasurementService calcService = new QuantityMeasurementService();
+    private QuantityMeasurementService measurementHelper = new QuantityMeasurementService();
 
     public void Run()
     {
-        while (true)
+        bool stopApp = false;
+
+        while (!stopApp)
         {
             Console.WriteLine("1. Conversion");
             Console.WriteLine("2. Comparison");
-            Console.WriteLine("3. Exit");
+            Console.WriteLine("3. Addition");
+            Console.WriteLine("4. Exit");
 
-            string option = Console.ReadLine() ?? "";
+            string userChoice = Console.ReadLine() ?? "";
 
-            switch (option)
+            switch (userChoice)
             {
                 case "1":
-                    RunConversion();
+                    StartConversionProcess();
                     break;
 
                 case "2":
-                    ShowComparisonOptions();
+                    OpenComparisonMenu();
                     break;
 
                 case "3":
-                    return;
+                    StartAdditionProcess();
+                    break;
+
+                case "4":
+                    stopApp = true;
+                    break;
 
                 default:
-                    Console.WriteLine("Invalid Input");
+                    Console.WriteLine("Invalid Choice");
                     break;
             }
         }
     }
 
     /// <summary>
-    /// Displays comparison choices and routes to the compare method.
+    /// Shows different comparison options and lets the user pick
+    /// which units they want to compare.
     /// </summary>
-    public void ShowComparisonOptions()
+    public void OpenComparisonMenu()
     {
-        while (true)
+        bool goBack = false;
+
+        while (!goBack)
         {
             Console.WriteLine("1. Compare Feet with Feet");
             Console.WriteLine("2. Compare Inches with Inches");
             Console.WriteLine("3. Compare Yards with Yards");
             Console.WriteLine("4. Compare Centimeter with Centimeter");
             Console.WriteLine("5. Compare Feet with Inches");
-            Console.WriteLine("6. compare Yards with Inches");
+            Console.WriteLine("6. Compare Yards with Inches");
             Console.WriteLine("7. Compare Centimeter with Inches");
             Console.WriteLine("8. Compare Feet with Yards");
             Console.WriteLine("9. Compare Centimeter with Feet");
             Console.WriteLine("10. Compare Yard with Centimeter");
             Console.WriteLine("11. Back");
 
-            string menuChoice = Console.ReadLine() ?? "";
+            string optionSelected = Console.ReadLine() ?? "";
 
-            if (menuChoice == "11")
-                return;
-
-            switch (menuChoice)
+            switch (optionSelected)
             {
-                case "1": ExecuteComparison(LengthUnit.Feet, LengthUnit.Feet); break;
-                case "2": ExecuteComparison(LengthUnit.Inches, LengthUnit.Inches); break;
-                case "3": ExecuteComparison(LengthUnit.Yards, LengthUnit.Yards); break;
-                case "4": ExecuteComparison(LengthUnit.Centimeters, LengthUnit.Centimeters); break;
-                case "5": ExecuteComparison(LengthUnit.Feet, LengthUnit.Inches); break;
-                case "6": ExecuteComparison(LengthUnit.Yards, LengthUnit.Inches); break;
-                case "7": ExecuteComparison(LengthUnit.Centimeters, LengthUnit.Inches); break;
-                case "8": ExecuteComparison(LengthUnit.Feet, LengthUnit.Yards); break;
-                case "9": ExecuteComparison(LengthUnit.Centimeters, LengthUnit.Feet); break;
-                case "10": ExecuteComparison(LengthUnit.Yards, LengthUnit.Centimeters); break;
+                case "1":
+                    CompareMeasurements(LengthUnit.Feet, LengthUnit.Feet);
+                    break;
+
+                case "2":
+                    CompareMeasurements(LengthUnit.Inches, LengthUnit.Inches);
+                    break;
+
+                case "3":
+                    CompareMeasurements(LengthUnit.Yards, LengthUnit.Yards);
+                    break;
+
+                case "4":
+                    CompareMeasurements(LengthUnit.Centimeters, LengthUnit.Centimeters);
+                    break;
+
+                case "5":
+                    CompareMeasurements(LengthUnit.Feet, LengthUnit.Inches);
+                    break;
+
+                case "6":
+                    CompareMeasurements(LengthUnit.Yards, LengthUnit.Inches);
+                    break;
+
+                case "7":
+                    CompareMeasurements(LengthUnit.Centimeters, LengthUnit.Inches);
+                    break;
+
+                case "8":
+                    CompareMeasurements(LengthUnit.Feet, LengthUnit.Yards);
+                    break;
+
+                case "9":
+                    CompareMeasurements(LengthUnit.Centimeters, LengthUnit.Feet);
+                    break;
+
+                case "10":
+                    CompareMeasurements(LengthUnit.Yards, LengthUnit.Centimeters);
+                    break;
+
+                case "11":
+                    goBack = true;
+                    break;
+
                 default:
                     Console.WriteLine("Invalid Input");
                     break;
@@ -86,28 +128,24 @@ public class QuantityMeasurementAppMenu
     }
 
     /// <summary>
-    /// Reads two numeric values from the console and checks
-    /// whether the measurements are equal after conversion.
+    /// Reads two values and checks whether they represent the same length.
     /// </summary>
-    private void ExecuteComparison(LengthUnit firstType, LengthUnit secondType)
+    private void CompareMeasurements(LengthUnit firstUnit, LengthUnit secondUnit)
     {
         try
         {
-            Console.Write($"Enter value1 in {firstType.GetSymbol()}: ");
-            double firstInput = Convert.ToDouble(Console.ReadLine());
+            Console.Write($"Enter value1 in {firstUnit.GetSymbol()}: ");
+            double firstValue = Convert.ToDouble(Console.ReadLine());
 
-            Console.Write($"Enter value2 in {secondType.GetSymbol()}: ");
-            double secondInput = Convert.ToDouble(Console.ReadLine());
+            Console.Write($"Enter value2 in {secondUnit.GetSymbol()}: ");
+            double secondValue = Convert.ToDouble(Console.ReadLine());
 
-            Quantity itemA = new Quantity(firstInput, firstType);
-            Quantity itemB = new Quantity(secondInput, secondType);
+            Quantity firstQuantity = new Quantity(firstValue, firstUnit);
+            Quantity secondQuantity = new Quantity(secondValue, secondUnit);
 
-            bool isEqual = calcService.Compare(itemA, itemB);
+            bool equality = measurementHelper.Compare(firstQuantity, secondQuantity);
 
-            if (isEqual)
-                Console.WriteLine("Measurement are Equal");
-            else
-                Console.WriteLine("Measurement are not Equal");
+            Console.WriteLine(equality ? "Measurement are Equal" : "Measurement are not Equal");
         }
         catch (Exception problem)
         {
@@ -116,27 +154,59 @@ public class QuantityMeasurementAppMenu
     }
 
     /// <summary>
-    /// Handles unit conversion by reading the value and
-    /// unit indexes from the console.
+    /// Handles value conversion from one unit to another.
     /// </summary>
-    private void RunConversion()
+    private void StartConversionProcess()
     {
         Console.Write("Enter Value: ");
-        double originalValue = Convert.ToDouble(Console.ReadLine());
+        double numberInput = Convert.ToDouble(Console.ReadLine());
 
         Console.WriteLine("Units : 0:Inches , 1:Feet, 2:Yard, 3:CM");
 
         Console.Write("Enter Source Unit Index: ");
-        int startIndex = int.Parse(Console.ReadLine() ?? "0");
+        LengthUnit fromUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
 
         Console.Write("Enter Target Unit Index: ");
-        int endIndex = int.Parse(Console.ReadLine() ?? "0");
+        LengthUnit toUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
 
-        LengthUnit startUnit = (LengthUnit)startIndex;
-        LengthUnit endUnit = (LengthUnit)endIndex;
+        try
+        {
+            double convertedValue = measurementHelper.DemonstrateLengthConversion(numberInput, fromUnit, toUnit);
 
-        double converted = calcService.DemonstrateLengthConversion(originalValue, startUnit, endUnit);
+            Console.WriteLine($"{numberInput}{fromUnit.GetSymbol()} = {convertedValue}{toUnit.GetSymbol()}");
+        }
+        catch (Exception err)
+        {
+            Console.WriteLine("Error: " + err.Message);
+        }
+    }
 
-        Console.WriteLine($"{originalValue}{startUnit.GetSymbol()} = {converted}{endUnit.GetSymbol()}");
+    /// <summary>
+    /// Reads two quantities and performs addition between them.
+    /// </summary>
+    private void StartAdditionProcess()
+    {
+        Console.WriteLine("Unit : 0:Inches, 1:Feet, 2:Yards 3:Centimeter");
+
+        Console.Write("Enter Value 1: ");
+        double firstInput = Convert.ToDouble(Console.ReadLine());
+
+        Console.Write("Unit 1(Index): ");
+        LengthUnit unitA = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
+
+        Quantity quantityA = new Quantity(firstInput, unitA);
+
+        Console.Write("Enter Value 2: ");
+        double secondInput = Convert.ToDouble(Console.ReadLine());
+
+        Console.Write("Unit 2(Index): ");
+        LengthUnit unitB = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
+
+        Quantity quantityB = new Quantity(secondInput, unitB);
+
+        Quantity sumResult = quantityA.Add(quantityB);
+
+        Console.WriteLine($"\nCalculation {quantityA} + {quantityB}");
+        Console.WriteLine($"Result = {sumResult}");
     }
 }
