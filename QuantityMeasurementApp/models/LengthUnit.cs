@@ -1,53 +1,54 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Lists all the length units supported in the application.
-    /// The order of the units matters because it matches the
-    /// position used in the conversion array.
+    /// Lists all length units supported by the application.
+    /// The order matters because it matches the conversion lookup table.
     /// </summary>
     public enum LengthUnit
     {
-        Inches,     
-        Feet,       
-        Yards,      
-        Centimeters 
+        Inches,       // position 0
+        Feet,         // position 1
+        Yards,        // position 2
+        Centimeters   // position 3
     }
 
     /// <summary>
-    /// Contains utility methods related to the LengthUnit enum,
-    /// mainly used for conversion and displaying unit symbols.
+    /// Utility methods that extend the LengthUnit enum.
+    /// These helpers keep conversion factors and display symbols in one place.
     /// </summary>
     public static class LengthUnitExtensions
     {
-        // Conversion values used to convert each unit to inches
-        private static readonly double[] conversionValues =
+        // Table used to convert any unit to the base unit (inches)
+        private static readonly double[] conversionTable =
         {
             1.0,        // Inches
-            12.0,       // Feet (1 ft = 12 inches)
-            36.0,       // Yards (1 yd = 36 inches)
-            0.393701    // Centimeters (1 cm ≈ 0.393701 inches)
+            12.0,       // Feet
+            36.0,       // Yards
+            0.393701    // Centimeters
         };
 
         /// <summary>
-        /// Returns the conversion value for the given unit.
+        /// Returns the factor required to convert the given unit into inches.
         /// </summary>
-        public static double GetConversionFactor(this LengthUnit lengthType)
+        public static double GetConversionFactor(this LengthUnit unitType)
         {
-            return conversionValues[(int)lengthType];
+            int index = (int)unitType;
+            double factor = conversionTable[index];
+            return factor;
         }
 
         /// <summary>
-        /// Returns the short symbol used to represent the unit.
+        /// Returns the short text symbol used for displaying the unit.
         /// </summary>
-        public static string GetSymbol(this LengthUnit lengthType)
+        public static string GetSymbol(this LengthUnit unitType)
         {
-            switch (lengthType)
+            switch (unitType)
             {
-                case LengthUnit.Feet:
-                    return "ft";
-
                 case LengthUnit.Inches:
                     return "in";
+
+                case LengthUnit.Feet:
+                    return "ft";
 
                 case LengthUnit.Yards:
                     return "yd";
@@ -56,7 +57,8 @@ namespace QuantityMeasurementApp.models
                     return "cm";
 
                 default:
-                    return lengthType.ToString().ToLower();
+                    string name = unitType.ToString().ToLower();
+                    return name;
             }
         }
     }

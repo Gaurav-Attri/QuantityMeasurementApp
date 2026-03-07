@@ -1,59 +1,85 @@
+using System.Runtime.Serialization.Formatters;
 
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents a generic measurement consisting of a value and a specific unit.
-    /// This class replaces the separate Feet and Inches classes to follow the DRY principle.
+    /// Represents a measurement with a numeric amount and a length unit.
+    /// It avoids creating separate classes like Feet or Inches by keeping
+    /// everything inside one reusable structure.
     /// </summary>
     public class Quantity
     {
-        private readonly double magnitude;
-        private readonly LengthUnit unit;
+        private readonly double amount;
+        private readonly LengthUnit lengthType;
 
-        
-        public Quantity(double magnitude , LengthUnit unit)
+        public Quantity(double amount, LengthUnit lengthType)
         {
-            this.magnitude = magnitude;
-            this.unit = unit;
+            this.amount = amount;
+            this.lengthType = lengthType;
+        }
+
+        // Converts a numeric value from one unit to another
+        public static double ConvertValue(double inputNumber, LengthUnit startUnit, LengthUnit endUnit)
+        {
+            if (startUnit == null || endUnit == null)
+            {
+                throw new ArgumentException("unit cannot be null");
+            }
+
+            double valueInBase = inputNumber * startUnit.GetConversionFactor();
+            double finalValue = valueInBase / endUnit.GetConversionFactor();
+
+            return finalValue;
+        }
+
+        // Converts the current Quantity object into another unit
+        public Quantity ConvertTo(LengthUnit newUnit)
+        {
+            double updatedAmount = ConvertValue(this.amount, this.lengthType, newUnit);
+            Quantity convertedQuantity = new Quantity(updatedAmount, newUnit);
+
+            return convertedQuantity;
+        }
+
+        // Converts the stored value into the base unit (inches)
+        private double toBaseUnit()
+        {
+            double baseNumber = amount * lengthType.GetConversionFactor();
+            return baseNumber;
         }
 
         /// <summary>
-        /// Uses a base-unit conversion strategy to allow cross-unit comparison (e.g., 1ft == 12in).
-        /// </summary>
-        private double convertToBase()
-        {
-            return magnitude*unit.GetConversionFactor();
-        }
-
-        /// <summary>
-        /// Determines if two Quantity objects are equal.
+        /// Checks whether two Quantity objects represent the same physical length.
+        /// Comparison is done after converting both values to a base unit.
         /// </summary>
         public override bool Equals(object? obj)
         {
-            // 1. Checks for reference equality
+            // Check if both references point to the same object
             if (ReferenceEquals(this, obj))
             {
                 return true;
             }
-            // 2. Checks for null and type safety
-            if(obj is not Quantity other)
+
+            // Ensure object is of the correct type
+            if (obj is not Quantity otherQuantity)
             {
                 return false;
             }
 
+            double difference = Math.Abs(this.toBaseUnit() - otherQuantity.toBaseUnit());
 
-            // Comparing the two with a tolerance of < 0.0001            
-            return Math.Abs(this.convertToBase() - other.convertToBase()) < 0.0001;
+            return difference < 0.001;
         }
 
         public override int GetHashCode()
         {
-            return convertToBase().GetHashCode();
+            double baseRepresentation = toBaseUnit();
+            return baseRepresentation.GetHashCode();
         }
 
         public override string ToString()
         {
-            return $"{magnitude} {unit.GetSymbol()}";
+            return $"{amount} {lengthType.GetSymbol()}";
         }
     }
 }

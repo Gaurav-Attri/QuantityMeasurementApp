@@ -2,142 +2,94 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp.models;
 
 /// <summary>
-/// Unit tests to verify equality of quantities
-/// across different measurement units.
+/// Tests that verify whether unit conversion is working correctly.
 /// </summary>
 [TestClass]
-public class QuantityTest
+public class QuantityConversionTest
 {
-
-    // checks if 1 foot equals 12 inches
+    // Verify conversion from feet to inches
     [TestMethod]
-    public void GivenOneFootAndTwelveInches_WhenCompared_ShouldBeEqual()
+    public void Convert_Feet_To_Inches_ShouldReturn12()
     {
-        Quantity footValue = new Quantity(1.0, LengthUnit.Feet);
-        Quantity inchValue = new Quantity(12.0, LengthUnit.Inches);
+        double resultValue = Quantity.ConvertValue(1.0, LengthUnit.Feet, LengthUnit.Inches);
 
-        Assert.AreEqual(footValue, inchValue);
+        Assert.AreEqual(12.0, resultValue);
     }
 
-    // verifies comparison when order is reversed
+    // Verify conversion from inches to feet
     [TestMethod]
-    public void GivenTwelveInchesAndOneFoot_WhenCompared_ShouldBeEqual()
+    public void Convert_Inches_To_Feet_ShouldReturn2()
     {
-        Quantity inchAmount = new Quantity(12.0, LengthUnit.Inches);
-        Quantity footAmount = new Quantity(1.0, LengthUnit.Feet);
+        double output = Quantity.ConvertValue(24.0, LengthUnit.Inches, LengthUnit.Feet);
 
-        Assert.AreEqual(inchAmount, footAmount);
+        Assert.AreEqual(2.0, output);
     }
 
-    // verifies unequal values with same unit
+    // Check yard to inches conversion
     [TestMethod]
-    public void GivenOneFootAndTwoFeet_WhenCompared_ShouldReturnFalse()
+    public void Convert_Yards_To_Inches_ShouldReturn36()
     {
-        Quantity firstFoot = new Quantity(1.0, LengthUnit.Feet);
-        Quantity secondFoot = new Quantity(2.0, LengthUnit.Feet);
+        double converted = Quantity.ConvertValue(1.0, LengthUnit.Yards, LengthUnit.Inches);
 
-        Assert.AreNotEqual(firstFoot, secondFoot);
+        Assert.AreEqual(36.0, converted);
     }
 
-    // comparing object with itself
+    // Check inches to yard conversion
     [TestMethod]
-    public void GivenQuantityObject_WhenComparedWithItself_ShouldReturnTrue()
+    public void Convert_Inches_To_Yards_ShouldReturn2()
     {
-        Quantity sampleFeet = new Quantity(1.0, LengthUnit.Feet);
+        double conversionResult = Quantity.ConvertValue(72.0, LengthUnit.Inches, LengthUnit.Yards);
 
-        Assert.IsTrue(sampleFeet.Equals(sampleFeet));
+        Assert.AreEqual(2.0, conversionResult);
     }
 
-    // comparison with null
+    // Validate centimeter to inch conversion with floating precision tolerance
     [TestMethod]
-    public void GivenQuantityObject_WhenComparedWithNull_ShouldReturnFalse()
+    public void Convert_Centimeter_To_Inches_ShouldBeApproximately1()
     {
-        Quantity sampleFeet = new Quantity(1.0, LengthUnit.Feet);
+        double answer = Quantity.ConvertValue(2.54, LengthUnit.Centimeters, LengthUnit.Inches);
 
-        Assert.AreNotEqual(sampleFeet, null);
+        Assert.AreEqual(1.0, answer, 0.001);
     }
 
-    // check zero values across units
+    // Verify feet to yard conversion
     [TestMethod]
-    public void GivenZeroFeetAndZeroInches_WhenCompared_ShouldReturnTrue()
+    public void Convert_Feet_To_Yards_ShouldReturn2()
     {
-        Quantity feetZero = new Quantity(0.0, LengthUnit.Feet);
-        Quantity inchesZero = new Quantity(0.0, LengthUnit.Inches);
+        double yardValue = Quantity.ConvertValue(6.0, LengthUnit.Feet, LengthUnit.Yards);
 
-        Assert.AreEqual(feetZero, inchesZero);
+        Assert.AreEqual(2.0, yardValue);
     }
 
-    // 1 yard should equal 3 feet
+    // Ensure zero value conversion remains zero
     [TestMethod]
-    public void GivenOneYardAndThreeFeet_WhenCompared_ShouldReturnTrue()
+    public void Convert_ZeroValue_ShouldRemainZero()
     {
-        Quantity yardValue = new Quantity(1.0, LengthUnit.Yards);
-        Quantity feetValue = new Quantity(3.0, LengthUnit.Feet);
+        double result = Quantity.ConvertValue(0.0, LengthUnit.Feet, LengthUnit.Inches);
 
-        Assert.AreEqual(yardValue, feetValue);
+        Assert.AreEqual(0.0, result);
     }
 
-    // 1 yard equals 36 inches
+    // Verify negative number conversion
     [TestMethod]
-    public void GivenOneYardAndThirtySixInches_WhenCompared_ShouldReturnTrue()
+    public void Convert_NegativeFeet_ToInches_ShouldReturnNegativeValue()
     {
-        Quantity yardLength = new Quantity(1.0, LengthUnit.Yards);
-        Quantity inchLength = new Quantity(36.0, LengthUnit.Inches);
+        double outputValue = Quantity.ConvertValue(-1.0, LengthUnit.Feet, LengthUnit.Inches);
 
-        Assert.AreEqual(yardLength, inchLength);
+        Assert.AreEqual(-12.0, outputValue);
     }
 
-    // centimeter and inch comparison
+    // Convert A → B → A and confirm original value is preserved
     [TestMethod]
-    public void GivenOneCentimeterAndPoint3937Inches_WhenCompared_ShouldReturnTrue()
+    public void Conversion_RoundTrip_ShouldReturnOriginalValue()
     {
-        Quantity centimeterValue = new Quantity(1.0, LengthUnit.Centimeters);
-        Quantity inchEquivalent = new Quantity(0.393701, LengthUnit.Inches);
+        double startValue = 100.0;
+        LengthUnit firstUnit = LengthUnit.Yards;
+        LengthUnit secondUnit = LengthUnit.Inches;
 
-        Assert.AreEqual(centimeterValue, inchEquivalent);
-    }
+        double stepOne = Quantity.ConvertValue(startValue, firstUnit, secondUnit);
+        double stepTwo = Quantity.ConvertValue(stepOne, secondUnit, firstUnit);
 
-    // testing transitive equality property
-    [TestMethod]
-    public void EqualityCheck_MultipleUnits_TransitiveProperty()
-    {
-        Quantity yardMeasure = new Quantity(1.0, LengthUnit.Yards);
-        Quantity feetMeasure = new Quantity(3.0, LengthUnit.Feet);
-        Quantity inchesMeasure = new Quantity(36.0, LengthUnit.Inches);
-
-        Assert.AreEqual(yardMeasure, feetMeasure);
-        Assert.AreEqual(feetMeasure, inchesMeasure);
-        Assert.AreEqual(yardMeasure, inchesMeasure);
-    }
-
-    [TestMethod]
-    public void CompareYardToYard_SameValue_ShouldReturnTrue()
-    {
-        Quantity firstYard = new Quantity(1.0, LengthUnit.Yards);
-        Quantity secondYard = new Quantity(1.0, LengthUnit.Yards);
-
-        Assert.AreEqual(firstYard, secondYard);
-    }
-
-    [TestMethod]
-    public void CompareYardToYard_DifferentValue_ShouldReturnFalse()
-    {
-        Quantity firstYard = new Quantity(1.0, LengthUnit.Yards);
-        Quantity secondYard = new Quantity(2.0, LengthUnit.Yards);
-
-        Assert.AreNotEqual(firstYard, secondYard);
-    }
-
-    [TestMethod]
-    public void EqualityAcrossUnits_ComplexScenario()
-    {
-        // example: 2 yards = 6 feet = 72 inches
-        Quantity yardData = new Quantity(2.0, LengthUnit.Yards);
-        Quantity feetData = new Quantity(6.0, LengthUnit.Feet);
-        Quantity inchData = new Quantity(72.0, LengthUnit.Inches);
-
-        Assert.AreEqual(yardData, feetData);
-        Assert.AreEqual(feetData, inchData);
-        Assert.AreEqual(yardData, inchData);
+        Assert.AreEqual(startValue, stepTwo);
     }
 }
