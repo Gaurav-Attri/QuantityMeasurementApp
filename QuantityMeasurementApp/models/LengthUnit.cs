@@ -1,27 +1,27 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents the length units supported in the application.
-    /// The numeric position of each value is important because
-    /// it is used to map conversion factors.
+    /// Represents the length units supported by the application.
+    /// The order matters because each value is used as an index
+    /// when accessing conversion factors.
     /// </summary>
     public enum LengthUnit
     {
-        Inches,        // 0
-        Feet,          // 1
-        Yards,         // 2
-        Centimeters    // 3
+        Inches,      // 0
+        Feet,        // 1
+        Yards,       // 2
+        Centimeters  // 3
     }
 
     /// <summary>
-    /// Utility methods that extend LengthUnit.
-    /// These methods help with unit conversions and display formatting.
+    /// Utility methods that extend the LengthUnit enum.
+    /// These helpers handle unit conversion and provide
+    /// display symbols for each measurement type.
     /// </summary>
     public static class LengthUnitExtensions
     {
-        // Conversion reference table: each index corresponds to a LengthUnit value
-        // and stores the multiplier required to convert that unit into inches.
-        private static readonly double[] inchesMultiplier =
+        // Array storing how each unit relates to the base unit (inches)
+        private static readonly double[] conversionToInches =
         {
             1.0,        // Inches
             12.0,       // Feet
@@ -30,27 +30,40 @@ namespace QuantityMeasurementApp.models
         };
 
         /// <summary>
-        /// Returns the multiplier required to convert the given unit to inches.
+        /// Returns the numeric factor required to convert
+        /// the selected unit into inches.
         /// </summary>
-        public static double GetConversionFactor(this LengthUnit lengthType)
+        public static double GetConversionFactor(this LengthUnit measurementUnit)
         {
-            int indexPosition = (int)lengthType;
-            return inchesMultiplier[indexPosition];
+            int index = (int)measurementUnit;
+            return conversionToInches[index];
+        }
+
+        public static double ConvertToBase(this LengthUnit measurementUnit, double amount)
+        {
+            double factor = measurementUnit.GetConversionFactor();
+            return amount * factor;
+        }
+
+        public static double ConvertFromBase(this LengthUnit measurementUnit, double inchesValue)
+        {
+            double factor = measurementUnit.GetConversionFactor();
+            return inchesValue / factor;
         }
 
         /// <summary>
-        /// Provides a short text symbol for the unit.
-        /// Used mainly for displaying values in the console.
+        /// Provides a short string representation of the unit
+        /// mainly used for displaying results in the console.
         /// </summary>
-        public static string GetSymbol(this LengthUnit lengthType)
+        public static string GetSymbol(this LengthUnit measurementUnit)
         {
-            switch (lengthType)
+            switch (measurementUnit)
             {
-                case LengthUnit.Inches:
-                    return "in";
-
                 case LengthUnit.Feet:
                     return "ft";
+
+                case LengthUnit.Inches:
+                    return "in";
 
                 case LengthUnit.Yards:
                     return "yd";
@@ -59,7 +72,7 @@ namespace QuantityMeasurementApp.models
                     return "cm";
 
                 default:
-                    return lengthType.ToString().ToLower();
+                    return measurementUnit.ToString().ToLower();
             }
         }
     }

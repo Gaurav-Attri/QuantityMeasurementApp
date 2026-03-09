@@ -3,9 +3,8 @@ using System;
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents a measurement that contains a numeric amount
-    /// along with its associated unit. It is designed to handle
-    /// operations like conversion, comparison and addition.
+    /// Represents a measurement consisting of a numeric value
+    /// and the unit associated with that value.
     /// </summary>
     public class Quantity
     {
@@ -18,70 +17,57 @@ namespace QuantityMeasurementApp.models
             this.lengthType = lengthType;
         }
 
-        // Converts a raw value from one unit to another and returns the numeric result
-        public static double ConvertValue(double inputValue, LengthUnit sourceUnit, LengthUnit destinationUnit)
+        // Convert numeric value from one unit to another
+        public static double ConvertValue(double input, LengthUnit sourceUnit, LengthUnit targetUnit)
         {
-            double inchesValue = inputValue * sourceUnit.GetConversionFactor();
-            double convertedResult = inchesValue / destinationUnit.GetConversionFactor();
-            return convertedResult;
+            double baseAmount = sourceUnit.ConvertToBase(input);
+            double result = targetUnit.ConvertFromBase(baseAmount);
+            return result;
         }
 
-        // Returns a new Quantity object converted into the specified unit
-        public Quantity ConvertTo(LengthUnit destination)
+        // Convert this Quantity to another unit
+        public Quantity ConvertTo(LengthUnit targetUnit)
         {
-            double resultValue = ConvertValue(this.amount, this.lengthType, destination);
-            return new Quantity(resultValue, destination);
-        }
+            double baseAmount = lengthType.ConvertToBase(amount);
+            double convertedValue = targetUnit.ConvertFromBase(baseAmount);
 
-        // Converts the current measurement into the base representation (inches)
-        private double ConvertToBaseUnit()
-        {
-            double baseValue = amount * lengthType.GetConversionFactor();
-            return baseValue;
+            return new Quantity(convertedValue, targetUnit);
         }
 
         /// <summary>
-        /// Adds another measurement to the current instance.
-        /// The output unit defaults to the unit of the first quantity.
+        /// Adds another quantity and returns the result
+        /// in the unit of the current instance.
         /// </summary>
-        public Quantity Add(Quantity anotherQuantity)
+        public Quantity Add(Quantity otherQuantity)
         {
-            if (anotherQuantity == null)
+            if (otherQuantity == null)
             {
-                throw new ArgumentNullException("The quantity to add cannot be null");
+                throw new ArgumentNullException("otherQuantity cannot be null");
             }
 
-            return Add(anotherQuantity, this.lengthType);
+            return Add(otherQuantity, this.lengthType);
         }
 
         /// <summary>
-        /// Adds two quantities and returns the result in the chosen unit.
+        /// Adds two quantities using a specified target unit.
         /// </summary>
-        public Quantity Add(Quantity anotherQuantity, LengthUnit resultUnit)
+        public Quantity Add(Quantity otherQuantity, LengthUnit resultUnit)
         {
-            return ExecuteAddition(this, anotherQuantity, resultUnit);
+            return PerformAddition(this, otherQuantity, resultUnit);
         }
 
-        /// <summary>
-        /// Internal helper used to perform the addition logic.
-        /// Both values are converted to the base unit first.
-        /// </summary>
-        private Quantity ExecuteAddition(Quantity firstQuantity, Quantity secondQuantity, LengthUnit desiredUnit)
+        private Quantity PerformAddition(Quantity firstQuantity, Quantity secondQuantity, LengthUnit resultUnit)
         {
-            double firstBase = firstQuantity.amount * firstQuantity.lengthType.GetConversionFactor();
-            double secondBase = secondQuantity.amount * secondQuantity.lengthType.GetConversionFactor();
+            double firstBase = firstQuantity.lengthType.ConvertToBase(firstQuantity.amount);
+            double secondBase = secondQuantity.lengthType.ConvertToBase(secondQuantity.amount);
 
             double totalBase = firstBase + secondBase;
 
-            double convertedTotal = totalBase / desiredUnit.GetConversionFactor();
+            double finalValue = resultUnit.ConvertFromBase(totalBase);
 
-            return new Quantity(convertedTotal, desiredUnit);
+            return new Quantity(finalValue, resultUnit);
         }
 
-        /// <summary>
-        /// Compares two Quantity objects by converting them into the base unit.
-        /// This allows values with different units to still be compared correctly.
-        /// </summary>
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(this, obj))
@@ -89,18 +75,21 @@ namespace QuantityMeasurementApp.models
                 return true;
             }
 
-            if (obj is not Quantity otherQuantity)
+            if (obj is not Quantity other)
             {
                 return false;
             }
 
-            double difference = Math.Abs(this.ConvertToBaseUnit() - otherQuantity.ConvertToBaseUnit());
-            return difference < 0.001;
+            double thisBase = lengthType.ConvertToBase(amount);
+            double otherBase = other.lengthType.ConvertToBase(other.amount);
+
+            return Math.Abs(thisBase - otherBase) < 0.001;
         }
 
         public override int GetHashCode()
         {
-            return ConvertToBaseUnit().GetHashCode();
+            double baseValue = lengthType.ConvertToBase(amount);
+            return baseValue.GetHashCode();
         }
 
         public override string ToString()
