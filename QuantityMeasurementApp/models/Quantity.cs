@@ -1,75 +1,86 @@
-using System.Runtime.Serialization.Formatters;
+using System;
 
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents a measurement containing a numeric amount and a length unit.
-    /// Instead of separate classes like Feet or Inches, this single class
-    /// handles all supported units.
+    /// Represents a measurement that contains a numeric amount
+    /// along with its associated unit. It is designed to handle
+    /// operations like conversion, comparison and addition.
     /// </summary>
     public class Quantity
     {
-        private readonly double amount;
-        private readonly LengthUnit unitType;
+        public readonly double amount;
+        public readonly LengthUnit lengthType;
 
-        public Quantity(double amount, LengthUnit unitType)
+        public Quantity(double amount, LengthUnit lengthType)
         {
             this.amount = amount;
-            this.unitType = unitType;
+            this.lengthType = lengthType;
         }
 
-        // UC5: Converts a numeric value from one unit to another
-        public static double ConvertValue(double inputNumber, LengthUnit fromUnit, LengthUnit toUnit)
+        // Converts a raw value from one unit to another and returns the numeric result
+        public static double ConvertValue(double inputValue, LengthUnit sourceUnit, LengthUnit destinationUnit)
         {
-            double valueInBaseUnit = inputNumber * fromUnit.GetConversionFactor();
-            double convertedNumber = valueInBaseUnit / toUnit.GetConversionFactor();
-
-            return convertedNumber;
+            double inchesValue = inputValue * sourceUnit.GetConversionFactor();
+            double convertedResult = inchesValue / destinationUnit.GetConversionFactor();
+            return convertedResult;
         }
 
-        // UC5: Returns a new Quantity object converted into another unit
-        public Quantity ConvertTo(LengthUnit destinationUnit)
+        // Returns a new Quantity object converted into the specified unit
+        public Quantity ConvertTo(LengthUnit destination)
         {
-            double updatedAmount = ConvertValue(this.amount, this.unitType, destinationUnit);
-            Quantity newQuantity = new Quantity(updatedAmount, destinationUnit);
-
-            return newQuantity;
+            double resultValue = ConvertValue(this.amount, this.lengthType, destination);
+            return new Quantity(resultValue, destination);
         }
 
-        // Converts the stored value to the base unit (inches)
-        private double ToBaseValue()
+        // Converts the current measurement into the base representation (inches)
+        private double ConvertToBaseUnit()
         {
-            double baseNumber = amount * unitType.GetConversionFactor();
-            return baseNumber;
+            double baseValue = amount * lengthType.GetConversionFactor();
+            return baseValue;
         }
 
         /// <summary>
-        /// UC6: Adds another quantity to the current object.
-        /// The final result is returned in the unit of the first quantity.
+        /// Adds another measurement to the current instance.
+        /// The output unit defaults to the unit of the first quantity.
         /// </summary>
         public Quantity Add(Quantity anotherQuantity)
         {
             if (anotherQuantity == null)
             {
-                throw new ArgumentNullException("anotherQuantity cannot be null");
+                throw new ArgumentNullException("The quantity to add cannot be null");
             }
 
-            // convert both quantities into base unit
-            double firstBase = this.amount * this.unitType.GetConversionFactor();
-            double secondBase = anotherQuantity.amount * anotherQuantity.unitType.GetConversionFactor();
-
-            // add base values
-            double combinedBase = firstBase + secondBase;
-
-            // convert result back into the original unit
-            double resultValue = combinedBase / this.unitType.GetConversionFactor();
-
-            return new Quantity(resultValue, this.unitType);
+            return Add(anotherQuantity, this.lengthType);
         }
 
         /// <summary>
-        /// UC1: Checks if two quantities represent the same physical length.
-        /// Both values are converted to a base unit before comparison.
+        /// Adds two quantities and returns the result in the chosen unit.
+        /// </summary>
+        public Quantity Add(Quantity anotherQuantity, LengthUnit resultUnit)
+        {
+            return ExecuteAddition(this, anotherQuantity, resultUnit);
+        }
+
+        /// <summary>
+        /// Internal helper used to perform the addition logic.
+        /// Both values are converted to the base unit first.
+        /// </summary>
+        private Quantity ExecuteAddition(Quantity firstQuantity, Quantity secondQuantity, LengthUnit desiredUnit)
+        {
+            double firstBase = firstQuantity.amount * firstQuantity.lengthType.GetConversionFactor();
+            double secondBase = secondQuantity.amount * secondQuantity.lengthType.GetConversionFactor();
+
+            double totalBase = firstBase + secondBase;
+
+            double convertedTotal = totalBase / desiredUnit.GetConversionFactor();
+
+            return new Quantity(convertedTotal, desiredUnit);
+        }
+
+        /// <summary>
+        /// Compares two Quantity objects by converting them into the base unit.
+        /// This allows values with different units to still be compared correctly.
         /// </summary>
         public override bool Equals(object? obj)
         {
@@ -83,19 +94,18 @@ namespace QuantityMeasurementApp.models
                 return false;
             }
 
-            double difference = Math.Abs(this.ToBaseValue() - otherQuantity.ToBaseValue());
+            double difference = Math.Abs(this.ConvertToBaseUnit() - otherQuantity.ConvertToBaseUnit());
             return difference < 0.001;
         }
 
         public override int GetHashCode()
         {
-            double baseRepresentation = ToBaseValue();
-            return baseRepresentation.GetHashCode();
+            return ConvertToBaseUnit().GetHashCode();
         }
 
         public override string ToString()
         {
-            return $"{amount} {unitType.GetSymbol()}";
+            return $"{amount} {lengthType.GetSymbol()}";
         }
     }
 }

@@ -1,25 +1,27 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Lists all length units supported by the application.
-    /// The order matters because it matches the conversion lookup table.
+    /// Represents the length units supported in the application.
+    /// The numeric position of each value is important because
+    /// it is used to map conversion factors.
     /// </summary>
     public enum LengthUnit
     {
-        Inches,       // position 0
-        Feet,         // position 1
-        Yards,        // position 2
-        Centimeters   // position 3
+        Inches,        // 0
+        Feet,          // 1
+        Yards,         // 2
+        Centimeters    // 3
     }
 
     /// <summary>
-    /// Utility methods that extend the LengthUnit enum.
-    /// These helpers keep conversion factors and display symbols in one place.
+    /// Utility methods that extend LengthUnit.
+    /// These methods help with unit conversions and display formatting.
     /// </summary>
     public static class LengthUnitExtensions
     {
-        // Table used to convert any unit to the base unit (inches)
-        private static readonly double[] conversionTable =
+        // Conversion reference table: each index corresponds to a LengthUnit value
+        // and stores the multiplier required to convert that unit into inches.
+        private static readonly double[] inchesMultiplier =
         {
             1.0,        // Inches
             12.0,       // Feet
@@ -28,21 +30,21 @@ namespace QuantityMeasurementApp.models
         };
 
         /// <summary>
-        /// Returns the factor required to convert the given unit into inches.
+        /// Returns the multiplier required to convert the given unit to inches.
         /// </summary>
-        public static double GetConversionFactor(this LengthUnit unitType)
+        public static double GetConversionFactor(this LengthUnit lengthType)
         {
-            int index = (int)unitType;
-            double factor = conversionTable[index];
-            return factor;
+            int indexPosition = (int)lengthType;
+            return inchesMultiplier[indexPosition];
         }
 
         /// <summary>
-        /// Returns the short text symbol used for displaying the unit.
+        /// Provides a short text symbol for the unit.
+        /// Used mainly for displaying values in the console.
         /// </summary>
-        public static string GetSymbol(this LengthUnit unitType)
+        public static string GetSymbol(this LengthUnit lengthType)
         {
-            switch (unitType)
+            switch (lengthType)
             {
                 case LengthUnit.Inches:
                     return "in";
@@ -57,8 +59,7 @@ namespace QuantityMeasurementApp.models
                     return "cm";
 
                 default:
-                    string name = unitType.ToString().ToLower();
-                    return name;
+                    return lengthType.ToString().ToLower();
             }
         }
     }
