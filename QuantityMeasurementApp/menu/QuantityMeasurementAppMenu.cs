@@ -2,45 +2,117 @@ using System;
 using QuantityMeasurementApp.models;
 
 /// <summary>
-/// Simple console menu used to interact with the Quantity Measurement system.
-/// It reads user input, shows options, and calls the required service methods
-/// for conversion, comparison, and addition of measurements.
+/// Console menu used to interact with the Quantity Measurement application.
+/// It allows users to perform operations like conversion, comparison,
+/// and addition for both length and weight measurements.
 /// </summary>
 public class QuantityMeasurementAppMenu
 {
-    private QuantityMeasurementService measurementService = new QuantityMeasurementService();
+    private QuantityMeasurementService measurementHelper = new QuantityMeasurementService();
 
     public void Run()
     {
-        bool stopProgram = false;
+        bool closeProgram = false;
 
-        while (!stopProgram)
+        while (!closeProgram)
         {
-            Console.WriteLine("1. Conversion");
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("Quantity Measurement App");
+            Console.WriteLine("-----------------------");
+
+            Console.WriteLine("\n1. Length Measurement");
+            Console.WriteLine("2. Weight Measurement");
+            Console.WriteLine("3. Exit");
+
+            string menuInput = Console.ReadLine() ?? "";
+
+            switch (menuInput)
+            {
+                case "1":
+                    RunLength();
+                    break;
+                case "2":
+                    RunWeight();
+                    break;
+                case "3":
+                    closeProgram = true;
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+        }
+    }
+
+    public void RunWeight()
+    {
+        bool goBack = false;
+
+        while (!goBack)
+        {
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("Weight Measurement");
+            Console.WriteLine("-----------------------");
+
+            Console.WriteLine("\n1. Conversion");
             Console.WriteLine("2. Comparison");
             Console.WriteLine("3. Addition");
             Console.WriteLine("4. Exit");
 
-            string userOption = Console.ReadLine() ?? "";
+            string selected = Console.ReadLine() ?? "";
 
-            switch (userOption)
+            switch (selected)
             {
                 case "1":
-                    HandleConversion();
+                    HandleWeightConversion();
                     break;
-
                 case "2":
-                    CompareRun();
+                    HandleWeightComparison();
                     break;
-
                 case "3":
-                    HandleAddition();
+                    HandleWeightAddition();
                     break;
-
                 case "4":
-                    stopProgram = true;
+                    goBack = true;
                     break;
+                default:
+                    Console.WriteLine("Invalid Choice");
+                    break;
+            }
+        }
+    }
 
+    public void RunLength()
+    {
+        bool leaveSection = false;
+
+        while (!leaveSection)
+        {
+            Console.WriteLine("-----------------------");
+            Console.WriteLine("Length Measurement");
+            Console.WriteLine("-----------------------");
+
+            Console.WriteLine("\n1. Conversion");
+            Console.WriteLine("2. Comparison");
+            Console.WriteLine("3. Addition");
+            Console.WriteLine("4. Exit");
+
+            string option = Console.ReadLine() ?? "";
+
+            switch (option)
+            {
+                case "1":
+                    HandleLengthConversion();
+                    break;
+                case "2":
+                    HandleLengthComparison();
+                    break;
+                case "3":
+                    HandleLengthAddition();
+                    break;
+                case "4":
+                    leaveSection = true;
+                    break;
                 default:
                     Console.WriteLine("Invalid Choice");
                     break;
@@ -49,178 +121,204 @@ public class QuantityMeasurementAppMenu
     }
 
     /// <summary>
-    /// Displays the comparison menu and allows the user to choose
-    /// different unit combinations to compare.
+    /// Compares two length measurements.
     /// </summary>
-    public void CompareRun()
-    {
-        bool goBack = false;
-
-        while (!goBack)
-        {
-            Console.WriteLine("1. Compare Feet with Feet");
-            Console.WriteLine("2. Compare Inches with Inches");
-            Console.WriteLine("3. Compare Yards with Yards");
-            Console.WriteLine("4. Compare Centimeter with Centimeter");
-            Console.WriteLine("5. Compare Feet with Inches");
-            Console.WriteLine("6. compare Yards with Inches");
-            Console.WriteLine("7. Compare Centimeter with Inches");
-            Console.WriteLine("8. Compare Feet with Yards");
-            Console.WriteLine("9. Compare Centimeter with Feet");
-            Console.WriteLine("10. Compare Yard with Centimeter");
-            Console.WriteLine("11. Back");
-
-            string selected = Console.ReadLine() ?? "";
-
-            switch (selected)
-            {
-                case "1":
-                    PerformComparison(LengthUnit.Feet, LengthUnit.Feet);
-                    break;
-
-                case "2":
-                    PerformComparison(LengthUnit.Inches, LengthUnit.Inches);
-                    break;
-
-                case "3":
-                    PerformComparison(LengthUnit.Yards, LengthUnit.Yards);
-                    break;
-
-                case "4":
-                    PerformComparison(LengthUnit.Centimeters, LengthUnit.Centimeters);
-                    break;
-
-                case "5":
-                    PerformComparison(LengthUnit.Feet, LengthUnit.Inches);
-                    break;
-
-                case "6":
-                    PerformComparison(LengthUnit.Yards, LengthUnit.Inches);
-                    break;
-
-                case "7":
-                    PerformComparison(LengthUnit.Centimeters, LengthUnit.Inches);
-                    break;
-
-                case "8":
-                    PerformComparison(LengthUnit.Feet, LengthUnit.Yards);
-                    break;
-
-                case "9":
-                    PerformComparison(LengthUnit.Centimeters, LengthUnit.Feet);
-                    break;
-
-                case "10":
-                    PerformComparison(LengthUnit.Yards, LengthUnit.Centimeters);
-                    break;
-
-                case "11":
-                    goBack = true;
-                    break;
-
-                default:
-                    Console.WriteLine("Invalid Input");
-                    break;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Takes two values with their units and checks whether
-    /// the measurements are equal after normalization.
-    /// </summary>
-    private void PerformComparison(LengthUnit firstUnit, LengthUnit secondUnit)
+    private void HandleLengthComparison()
     {
         try
         {
-            Console.Write($"Enter value1 in {firstUnit.GetSymbol()}: ");
-            double firstValue = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("\n--- Length Comparison ---");
+            Console.WriteLine("Available Units: 0:Inches, 1:Feet, 2:Yards, 3:CM");
 
-            Console.Write($"Enter value2 in {secondUnit.GetSymbol()}: ");
-            double secondValue = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Select First Unit Index: ");
+            LengthUnit firstUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "0");
 
-            Quantity quantityA = new Quantity(firstValue, firstUnit);
-            Quantity quantityB = new Quantity(secondValue, secondUnit);
+            Console.Write($"Enter value in {firstUnit.GetSymbol()}: ");
+            double firstValue = double.Parse(Console.ReadLine() ?? "0");
 
-            bool areEqual = measurementService.Compare(quantityA, quantityB);
+            Console.Write("Select Second Unit Index: ");
+            LengthUnit secondUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "0");
 
-            Console.WriteLine(areEqual
-                ? "Measurement are Equal"
-                : "Measurement are not Equal");
+            Console.Write($"Enter value in {secondUnit.GetSymbol()}: ");
+            double secondValue = double.Parse(Console.ReadLine() ?? "0");
+
+            Quantity q1 = new Quantity(firstValue, firstUnit);
+            Quantity q2 = new Quantity(secondValue, secondUnit);
+
+            bool isSame = q1.Equals(q2);
+
+            Console.WriteLine("\n-----------------------");
+            Console.WriteLine($"Result: {q1} {(isSame ? "==" : "!=")} {q2}");
+            Console.WriteLine(isSame ? "Measurements are Equal" : "Measurements are NOT Equal");
+            Console.WriteLine("-----------------------\n");
         }
         catch (Exception error)
         {
-            Console.WriteLine("Error: " + error.Message);
+            Console.WriteLine($"\nError: {error.Message}");
         }
     }
 
     /// <summary>
-    /// Reads a value and converts it from one unit to another
-    /// using the service layer.
+    /// Handles length conversion between two units.
     /// </summary>
-    private void HandleConversion()
+    private void HandleLengthConversion()
     {
-        Console.Write("Enter Value: ");
-        double inputValue = Convert.ToDouble(Console.ReadLine());
-
-        Console.WriteLine("Units : 0:Inches , 1:Feet, 2:Yard, 3:CM");
-
-        Console.Write("Enter Source Unit Index: ");
-        LengthUnit fromUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
-
-        Console.Write("Enter Target Unit Index: ");
-        LengthUnit toUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
-
         try
         {
-            double convertedValue = measurementService
-                .DemonstrateLengthConversion(inputValue, fromUnit, toUnit);
+            Console.Write("Enter Value: ");
+            double inputValue = Convert.ToDouble(Console.ReadLine());
 
-            Console.WriteLine($"{inputValue}{fromUnit.GetSymbol()} = {convertedValue}{toUnit.GetSymbol()}");
+            Console.WriteLine("Units : 0:Inches , 1:Feet, 2:Yard, 3:CM");
+
+            Console.Write("Enter Source Unit Index: ");
+            LengthUnit sourceUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
+
+            Console.Write("Enter Target Unit Index: ");
+            LengthUnit targetUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
+
+            double result = measurementHelper.DemonstrateLengthConversion(inputValue, sourceUnit, targetUnit);
+
+            Console.WriteLine($"{inputValue}{sourceUnit.GetSymbol()} = {result}{targetUnit.GetSymbol()}");
         }
-        catch (Exception err)
+        catch (Exception ex)
         {
-            Console.WriteLine("Error: " + err.Message);
+            Console.WriteLine("Error: " + ex.Message);
         }
     }
 
-    private void HandleAddition()
+    /// <summary>
+    /// Adds two length measurements.
+    /// </summary>
+    private void HandleLengthAddition()
     {
         Console.WriteLine("Unit : 0:Inches, 1:Feet, 2:Yards 3:Centimeter");
 
         Console.Write("Enter Value 1: ");
-        double firstInput = Convert.ToDouble(Console.ReadLine());
+        double firstValue = Convert.ToDouble(Console.ReadLine());
 
         Console.Write("Unit 1(Index): ");
         LengthUnit firstUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
 
-        Quantity firstQuantity = new Quantity(firstInput, firstUnit);
+        Quantity firstQuantity = new Quantity(firstValue, firstUnit);
 
         Console.Write("Enter Value 2: ");
-        double secondInput = Convert.ToDouble(Console.ReadLine());
+        double secondValue = Convert.ToDouble(Console.ReadLine());
 
         Console.Write("Unit 2(Index): ");
         LengthUnit secondUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
 
-        Quantity secondQuantity = new Quantity(secondInput, secondUnit);
+        Quantity secondQuantity = new Quantity(secondValue, secondUnit);
 
         Console.Write("Explicit target selection (Y/N): ");
-        string userDecision = Console.ReadLine()?.ToLower() ?? "n";
+        string decision = Console.ReadLine()?.ToLower() ?? "n";
 
-        Quantity finalResult;
+        Quantity result;
 
-        if (userDecision == "y")
+        if (decision == "y")
         {
             Console.WriteLine("Enter the unit index of Target unit");
-            LengthUnit desiredUnit = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
-            finalResult = firstQuantity.Add(secondQuantity, desiredUnit);
+            LengthUnit target = (LengthUnit)int.Parse(Console.ReadLine() ?? "");
+            result = firstQuantity.Add(secondQuantity, target);
         }
         else
         {
-            finalResult = firstQuantity.Add(secondQuantity);
+            result = firstQuantity.Add(secondQuantity);
         }
 
         Console.WriteLine($"\nCalculation {firstQuantity} + {secondQuantity}");
-        Console.WriteLine($"Result = {finalResult}");
+        Console.WriteLine($"Result = {result}");
+    }
+
+    /// <summary>
+    /// Compares two weight quantities.
+    /// </summary>
+    private void HandleWeightComparison()
+    {
+        try
+        {
+            Console.WriteLine("Units: 0:Grams, 1:Kilograms, 2:Pounds");
+
+            Console.Write("Enter Value 1: ");
+            double firstValue = Convert.ToDouble(Console.ReadLine());
+
+            Console.Write("Enter Unit 1 Index: ");
+            WeightUnit firstUnit = (WeightUnit)int.Parse(Console.ReadLine() ?? "0");
+
+            Console.Write("Enter Value 2: ");
+            double secondValue = Convert.ToDouble(Console.ReadLine());
+
+            Console.Write("Enter Unit 2 Index: ");
+            WeightUnit secondUnit = (WeightUnit)int.Parse(Console.ReadLine() ?? "0");
+
+            QuantityWeight w1 = new QuantityWeight(firstValue, firstUnit);
+            QuantityWeight w2 = new QuantityWeight(secondValue, secondUnit);
+
+            Console.WriteLine(w1.Equals(w2) ? "Weights are Equal" : "Weights are not Equal");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Converts weight between two units.
+    /// </summary>
+    private void HandleWeightConversion()
+    {
+        Console.Write("Enter Value: ");
+        double inputWeight = Convert.ToDouble(Console.ReadLine());
+
+        Console.WriteLine("Units: 0:Grams, 1:Kilograms, 2:Pounds");
+
+        Console.Write("Enter Source Unit Index: ");
+        WeightUnit source = (WeightUnit)int.Parse(Console.ReadLine() ?? "0");
+
+        Console.Write("Enter Target Unit Index: ");
+        WeightUnit target = (WeightUnit)int.Parse(Console.ReadLine() ?? "0");
+
+        QuantityWeight weightObj = new QuantityWeight(inputWeight, source);
+        QuantityWeight result = weightObj.ConvertTo(target);
+
+        Console.WriteLine($"{inputWeight}{source.GetSymbol()} = {result.amount}{target.GetSymbol()}");
+    }
+
+    /// <summary>
+    /// Adds two weight quantities.
+    /// </summary>
+    private void HandleWeightAddition()
+    {
+        Console.WriteLine("Units: 0:Grams, 1:Kilograms, 2:Pounds");
+
+        Console.Write("Enter Value 1: ");
+        double firstValue = Convert.ToDouble(Console.ReadLine());
+
+        WeightUnit firstUnit = (WeightUnit)int.Parse(Console.ReadLine() ?? "0");
+
+        Console.Write("Enter Value 2: ");
+        double secondValue = Convert.ToDouble(Console.ReadLine());
+
+        WeightUnit secondUnit = (WeightUnit)int.Parse(Console.ReadLine() ?? "0");
+
+        QuantityWeight w1 = new QuantityWeight(firstValue, firstUnit);
+        QuantityWeight w2 = new QuantityWeight(secondValue, secondUnit);
+
+        Console.Write("Explicit target selection (Y/N): ");
+        string choice = Console.ReadLine()?.ToLower() ?? "n";
+
+        QuantityWeight result;
+
+        if (choice == "y")
+        {
+            Console.Write("Enter Target Unit Index: ");
+            WeightUnit target = (WeightUnit)int.Parse(Console.ReadLine() ?? "0");
+            result = w1.Add(w2, target);
+        }
+        else
+        {
+            result = w1.Add(w2, firstUnit);
+        }
+
+        Console.WriteLine($"\nResult = {result.amount} {result.unitType.GetSymbol()}");
     }
 }

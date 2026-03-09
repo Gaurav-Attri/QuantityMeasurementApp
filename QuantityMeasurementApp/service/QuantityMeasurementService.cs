@@ -1,51 +1,53 @@
 using QuantityMeasurementApp.models;
 
-// Handles operations such as comparison, conversion and addition
-// for Quantity objects.
+/// <summary>
+/// Service layer that coordinates comparison, conversion,
+/// and addition operations for quantity objects.
+/// </summary>
 public class QuantityMeasurementService
 {
     /// <summary>
-    /// Checks whether two measurements represent the same length.
-    /// Actual conversion and equality logic is handled inside Quantity.
+    /// Checks whether two quantity objects represent the same measurement.
     /// </summary>
-    public bool Compare(Quantity firstMeasurement, Quantity secondMeasurement)
+    public bool Compare(Quantity firstQuantity, Quantity secondQuantity)
     {
-        if (firstMeasurement == null || secondMeasurement == null)
+        if (firstQuantity == null || secondQuantity == null)
         {
             return false;
         }
 
-        bool result = firstMeasurement.Equals(secondMeasurement);
-        return result;
+        return firstQuantity.Equals(secondQuantity);
     }
 
     /// <summary>
-    /// Converts a numeric value from one unit to another
-    /// by using the conversion utility from the Quantity class.
+    /// Converts a numeric length value from one unit to another.
     /// </summary>
+    /// <param name="inputValue">numeric value to convert</param>
+    /// <param name="sourceUnit">unit of the given value</param>
+    /// <param name="targetUnit">unit we want the result in</param>
+    /// <returns>converted numeric value</returns>
     public double DemonstrateLengthConversion(double inputValue, LengthUnit sourceUnit, LengthUnit targetUnit)
     {
-        double converted = Quantity.ConvertValue(inputValue, sourceUnit, targetUnit);
-        return converted;
+        return Quantity.ConvertValue(inputValue, sourceUnit, targetUnit);
     }
 
     /// <summary>
-    /// Converts a Quantity object into the specified unit
-    /// and returns a new converted Quantity.
+    /// Converts a Quantity object into another length unit.
     /// </summary>
-    public Quantity DemonstrateLengthConversion(Quantity sourceQuantity, LengthUnit desiredUnit)
+    /// <param name="originalQuantity">quantity object to convert</param>
+    /// <param name="targetUnit">desired unit</param>
+    /// <returns>converted Quantity object</returns>
+    public Quantity DemonstrateLengthConversion(Quantity originalQuantity, LengthUnit targetUnit)
     {
-        Quantity convertedQuantity = sourceQuantity.ConvertTo(desiredUnit);
-        return convertedQuantity;
+        return originalQuantity.ConvertTo(targetUnit);
     }
 
     /// <summary>
-    /// Adds two Quantity objects together and returns
-    /// the result using the unit of the first quantity.
+    /// Adds two quantities and returns the result.
+    /// The result uses the unit of the first quantity.
     /// </summary>
     public Quantity DemonstrateAddition(Quantity firstQuantity, Quantity secondQuantity)
     {
-        Quantity total = firstQuantity.Add(secondQuantity);
-        return total;
+        return firstQuantity.Add(secondQuantity);
     }
 }
