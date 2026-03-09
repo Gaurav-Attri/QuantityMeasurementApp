@@ -1,64 +1,66 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents the volume measurement units used in the system.
-    /// The position of each value is important because it maps to the
-    /// conversion factor stored in the array below.
+    /// Represents the volume units used in the system.
+    /// The enum position is used to fetch the correct conversion multiplier.
     /// </summary>
     public enum VolumeUnit
     {
-        Litre,        // position 0
-        MilliLiter,   // position 1
-        Gallon        // position 2
+        Litre,
+        MilliLiter,
+        Gallon
     }
 
+    /// <summary>
+    /// Utility functions for converting and formatting VolumeUnit values.
+    /// </summary>
     public static class VolumeUnitExtension
     {
-        // Conversion values to convert a unit into litres
-        private static readonly double[] conversionValues =
+        // Conversion multipliers relative to the base unit (Litre)
+        private static readonly double[] litreScale =
         {
-            1.0,      // Litre
-            0.001,    // Millilitre
-            3.78541   // Gallon
+            1.0,       // Litre
+            0.001,     // Milliliter
+            3.78541    // Gallon
         };
 
-        /// <summary>
-        /// Returns the factor required to convert a unit into litres.
-        /// </summary>
-        public static double GetConversionFactor(this VolumeUnit currentUnit)
+        public static double GetConversionFactor(this VolumeUnit unitType)
         {
-            int index = (int)currentUnit;
-            return conversionValues[index];
+            int position = (int)unitType;
+            return litreScale[position];
         }
 
-        // Converts a given value into the base unit (litre)
-        public static double ConvertToBase(this VolumeUnit currentUnit, double inputAmount)
+        // Convert a given value to the base unit (Litre)
+        public static double ConvertToBase(this VolumeUnit unitType, double amount)
         {
-            double factor = currentUnit.GetConversionFactor();
-            double result = inputAmount * factor;
-            return result;
+            double factor = unitType.GetConversionFactor();
+            return amount * factor;
         }
 
-        // Converts a value from litre to the requested unit
-        public static double ConvertFromBase(this VolumeUnit currentUnit, double litreValue)
+        // Convert a base unit value back into the desired unit
+        public static double ConvertFromBase(this VolumeUnit unitType, double baseAmount)
         {
-            double factor = currentUnit.GetConversionFactor();
-            return litreValue / factor;
+            double factor = unitType.GetConversionFactor();
+            return baseAmount / factor;
         }
 
-        // Provides the display symbol for the unit
-        public static string GetSymbol(this VolumeUnit currentUnit)
+        // Returns a short unit label used for display
+        public static string GetSymbol(this VolumeUnit unitType)
         {
-            if (currentUnit == VolumeUnit.Litre)
-                return "L";
+            switch (unitType)
+            {
+                case VolumeUnit.Litre:
+                    return "L";
 
-            if (currentUnit == VolumeUnit.MilliLiter)
-                return "ML";
+                case VolumeUnit.MilliLiter:
+                    return "ML";
 
-            if (currentUnit == VolumeUnit.Gallon)
-                return "gal";
+                case VolumeUnit.Gallon:
+                    return "gal";
 
-            return currentUnit.ToString().ToLower();
+                default:
+                    return unitType.ToString().ToLower();
+            }
         }
     }
 }

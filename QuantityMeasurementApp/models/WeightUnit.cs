@@ -2,58 +2,44 @@ namespace QuantityMeasurementApp.models
 {
     public enum WeightUnit
     {
-        Grams,       // 0
-        Kilograms,   // 1
-        Pound        // 2
+        Grams,
+        Kilograms,
+        Pound
     }
 
     /// <summary>
-    /// Utility functions related to weight units.
-    /// Handles conversion logic and symbol lookup.
+    /// Utility methods for handling weight unit conversions.
     /// </summary>
     public static class WeightUnitExtension
     {
-        // Conversion multipliers where kilogram acts as the base reference
-        private static readonly double[] baseKgMap =
+        // Conversion multipliers relative to Kilograms (base)
+        private static readonly double[] kgMultiplier =
         {
-            0.001,      // Grams
-            1.0,        // Kilograms
-            0.453592    // Pound
+            0.001,
+            1.0,
+            0.453592
         };
 
-        /// <summary>
-        /// Returns the multiplier used to convert a unit to kilograms.
-        /// </summary>
-        public static double GetConversionFactor(this WeightUnit weightType)
+        public static double GetConversionFactor(this WeightUnit unitType)
         {
-            int idx = (int)weightType;
-            return baseKgMap[idx];
+            return kgMultiplier[(int)unitType];
         }
 
-        /// <summary>
-        /// Converts a value from the current unit to kilograms.
-        /// </summary>
-        public static double ConvertToBase(this WeightUnit weightType, double amount)
+        public static double ConvertToBase(this WeightUnit unitType, double amount)
         {
-            double factor = weightType.GetConversionFactor();
+            double factor = unitType.GetConversionFactor();
             return amount * factor;
         }
 
-        /// <summary>
-        /// Converts a kilogram value to the given weight unit.
-        /// </summary>
-        public static double ConvertFromBase(this WeightUnit weightType, double kgValue)
+        public static double ConvertFromBase(this WeightUnit unitType, double baseAmount)
         {
-            double factor = weightType.GetConversionFactor();
-            return kgValue / factor;
+            double factor = unitType.GetConversionFactor();
+            return baseAmount / factor;
         }
 
-        /// <summary>
-        /// Returns a short label used for displaying the unit.
-        /// </summary>
-        public static string GetSymbol(this WeightUnit weightType)
+        public static string GetSymbol(this WeightUnit unitType)
         {
-            switch (weightType)
+            switch (unitType)
             {
                 case WeightUnit.Grams:
                     return "g";
@@ -65,7 +51,7 @@ namespace QuantityMeasurementApp.models
                     return "lb";
 
                 default:
-                    return weightType.ToString().ToLower();
+                    return unitType.ToString().ToLower();
             }
         }
     }
