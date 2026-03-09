@@ -1,9 +1,8 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents the length units supported by the application.
-    /// The order matters because each value is used as an index
-    /// when accessing conversion factors.
+    /// Represents different units that can be used for measuring length.
+    /// The position of each value corresponds to its index in the conversion table.
     /// </summary>
     public enum LengthUnit
     {
@@ -14,14 +13,13 @@ namespace QuantityMeasurementApp.models
     }
 
     /// <summary>
-    /// Utility methods that extend the LengthUnit enum.
-    /// These helpers handle unit conversion and provide
-    /// display symbols for each measurement type.
+    /// Utility methods related to LengthUnit.
+    /// Handles conversion and symbol retrieval.
     /// </summary>
     public static class LengthUnitExtensions
     {
-        // Array storing how each unit relates to the base unit (inches)
-        private static readonly double[] conversionToInches =
+        // Conversion multipliers with Inches treated as the base reference
+        private static readonly double[] inchReference =
         {
             1.0,        // Inches
             12.0,       // Feet
@@ -30,40 +28,44 @@ namespace QuantityMeasurementApp.models
         };
 
         /// <summary>
-        /// Returns the numeric factor required to convert
-        /// the selected unit into inches.
+        /// Returns the factor used to convert a unit into inches.
         /// </summary>
-        public static double GetConversionFactor(this LengthUnit measurementUnit)
+        public static double GetConversionFactor(this LengthUnit type)
         {
-            int index = (int)measurementUnit;
-            return conversionToInches[index];
-        }
-
-        public static double ConvertToBase(this LengthUnit measurementUnit, double amount)
-        {
-            double factor = measurementUnit.GetConversionFactor();
-            return amount * factor;
-        }
-
-        public static double ConvertFromBase(this LengthUnit measurementUnit, double inchesValue)
-        {
-            double factor = measurementUnit.GetConversionFactor();
-            return inchesValue / factor;
+            int index = (int)type;
+            return inchReference[index];
         }
 
         /// <summary>
-        /// Provides a short string representation of the unit
-        /// mainly used for displaying results in the console.
+        /// Converts a given value into the base unit (inches).
         /// </summary>
-        public static string GetSymbol(this LengthUnit measurementUnit)
+        public static double ConvertToBase(this LengthUnit type, double amount)
         {
-            switch (measurementUnit)
-            {
-                case LengthUnit.Feet:
-                    return "ft";
+            double factor = type.GetConversionFactor();
+            return amount * factor;
+        }
 
+        /// <summary>
+        /// Converts a value from the base unit (inches) back to the target unit.
+        /// </summary>
+        public static double ConvertFromBase(this LengthUnit type, double baseAmount)
+        {
+            double factor = type.GetConversionFactor();
+            return baseAmount / factor;
+        }
+
+        /// <summary>
+        /// Provides the short label used when displaying the unit.
+        /// </summary>
+        public static string GetSymbol(this LengthUnit type)
+        {
+            switch (type)
+            {
                 case LengthUnit.Inches:
                     return "in";
+
+                case LengthUnit.Feet:
+                    return "ft";
 
                 case LengthUnit.Yards:
                     return "yd";
@@ -72,7 +74,7 @@ namespace QuantityMeasurementApp.models
                     return "cm";
 
                 default:
-                    return measurementUnit.ToString().ToLower();
+                    return type.ToString().ToLower();
             }
         }
     }
