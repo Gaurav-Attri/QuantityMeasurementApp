@@ -4,56 +4,61 @@ using QuantityMeasurementApp.Models;
 namespace QuantityMeasurementApp.Services
 {
     /// <summary>
-    /// Service layer that performs common quantity operations
-    /// like comparison, conversion, and addition.
+    /// Handles common operations for Quantity objects such as comparison,
+    /// conversion between units, and addition. It simply delegates the work
+    /// to the Quantity model while keeping the usage cleaner for callers.
     /// </summary>
     public class QuantityMeasurementService
     {
         /// <summary>
-        /// Checks whether two quantities represent the same value.
+        /// Checks whether two quantities represent the same measurement.
         /// </summary>
-        public bool Compare<U>(Quantity<U> firstQuantity, Quantity<U> secondQuantity) where U : struct, Enum
+        public bool Compare<U>(Quantity<U> firstItem, Quantity<U> secondItem) where U : struct, Enum
         {
-            if (firstQuantity == null || secondQuantity == null)
+            if (firstItem is null || secondItem is null)
                 return false;
 
-            return firstQuantity.Equals(secondQuantity);
+            bool areEqual = firstItem.Equals(secondItem);
+            return areEqual;
         }
 
         /// <summary>
-        /// Converts a raw numeric value from one unit to another.
+        /// Converts a numeric value from one unit to another.
         /// </summary>
         public double DemonstrateConversion<U>(double amount, U fromUnit, U toUnit) where U : struct, Enum
         {
             Quantity<U> original = new Quantity<U>(amount, fromUnit);
             Quantity<U> converted = original.ConvertTo(toUnit);
 
-            return converted.Value;
+            double finalValue = converted.Value;
+            return finalValue;
         }
 
         /// <summary>
-        /// Converts an existing quantity into another unit.
+        /// Converts a Quantity instance into a different unit.
         /// </summary>
-        public Quantity<U> DemonstrateConversion<U>(Quantity<U> sourceQuantity, U destinationUnit) where U : struct, Enum
+        public Quantity<U> DemonstrateConversion<U>(Quantity<U> inputQuantity, U destinationUnit) where U : struct, Enum
         {
-            Quantity<U> result = sourceQuantity.ConvertTo(destinationUnit);
-            return result;
+            Quantity<U> resultQuantity = inputQuantity.ConvertTo(destinationUnit);
+            return resultQuantity;
         }
 
         /// <summary>
-        /// Adds two quantities and keeps the result in the first quantity's unit.
+        /// Adds two quantities and keeps the unit of the first parameter.
         /// </summary>
-        public Quantity<U> DemonstrateAddition<U>(Quantity<U> firstQuantity, Quantity<U> secondQuantity) where U : struct, Enum
+        public Quantity<U> DemonstrateAddition<U>(Quantity<U> firstValue, Quantity<U> secondValue) where U : struct, Enum
         {
-            return firstQuantity.Add(secondQuantity);
+            Quantity<U> sum = firstValue.Add(secondValue);
+            return sum;
         }
 
         /// <summary>
-        /// Adds two quantities and converts the result to a chosen unit.
+        /// Adds two quantities and converts the result to a specific unit.
         /// </summary>
-        public Quantity<U> DemonstrateAddition<U>(Quantity<U> firstQuantity, Quantity<U> secondQuantity, U resultUnit) where U : struct, Enum
+        public Quantity<U> DemonstrateAddition<U>(Quantity<U> firstValue, Quantity<U> secondValue, U resultUnit) where U : struct, Enum
         {
-            return firstQuantity.Add(secondQuantity, resultUnit);
+            Quantity<U> total = firstValue.Add(secondValue, resultUnit);
+            return total;
         }
     }
 }

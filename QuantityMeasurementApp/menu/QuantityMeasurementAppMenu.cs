@@ -9,20 +9,21 @@ public class QuantityMeasurementAppMenu
 
     public void Run()
     {
-        bool shouldExit = false;
+        bool shouldStop = false;
 
-        while (!shouldExit)
+        while (!shouldStop)
         {
             Console.WriteLine("\n-----------------------");
             Console.WriteLine("Quantity Measurement App (UC10)");
             Console.WriteLine("-----------------------");
             Console.WriteLine("1. Length Measurement");
             Console.WriteLine("2. Weight Measurement");
-            Console.WriteLine("3. Exit");
+            Console.WriteLine("3. Volume Measurement");
+            Console.WriteLine("4. Exit");
 
-            string userChoice = Console.ReadLine() ?? "";
+            string userInput = Console.ReadLine() ?? "";
 
-            switch (userChoice)
+            switch (userInput)
             {
                 case "1":
                     RunCategory<LengthUnit>("Length", "0:Inches, 1:Feet, 2:Yards, 3:CM");
@@ -33,7 +34,11 @@ public class QuantityMeasurementAppMenu
                     break;
 
                 case "3":
-                    shouldExit = true;
+                    RunCategory<VolumeUnit>("Volume", "0:Liter, 1:MilliLiter, 2:Gallon");
+                    break;
+
+                case "4":
+                    shouldStop = true;
                     break;
 
                 default:
@@ -44,13 +49,14 @@ public class QuantityMeasurementAppMenu
     }
 
     /// <summary>
-    /// Generic handler for running a measurement category menu.
+    /// Runs the selected measurement category menu and routes the action
+    /// to the appropriate handler method.
     /// </summary>
     private void RunCategory<T>(string categoryName, string availableUnits) where T : struct, Enum
     {
-        bool returnToMain = false;
+        bool goBack = false;
 
-        while (!returnToMain)
+        while (!goBack)
         {
             Console.WriteLine($"\n--- {categoryName} Measurement ---");
             Console.WriteLine("1. Conversion");
@@ -75,7 +81,7 @@ public class QuantityMeasurementAppMenu
                     break;
 
                 case "4":
-                    returnToMain = true;
+                    goBack = true;
                     break;
 
                 default:
@@ -85,104 +91,104 @@ public class QuantityMeasurementAppMenu
         }
     }
 
-    private void ProcessComparison<T>(string unitsInfo) where T : struct, Enum
+    private void ProcessComparison<T>(string availableUnits) where T : struct, Enum
     {
         try
         {
-            Console.WriteLine(unitsInfo);
+            Console.WriteLine(availableUnits);
 
-            Console.Write("Enter first value: ");
-            double firstValue = double.Parse(Console.ReadLine()!);
+            Console.Write("Value 1: ");
+            double firstNumber = double.Parse(Console.ReadLine()!);
 
-            Console.Write("First unit index: ");
+            Console.Write("Unit 1 Index: ");
             T firstUnit = (T)(object)int.Parse(Console.ReadLine()!);
 
-            Console.Write("Enter second value: ");
-            double secondValue = double.Parse(Console.ReadLine()!);
+            Console.Write("Value 2: ");
+            double secondNumber = double.Parse(Console.ReadLine()!);
 
-            Console.Write("Second unit index: ");
+            Console.Write("Unit 2 Index: ");
             T secondUnit = (T)(object)int.Parse(Console.ReadLine()!);
 
-            var quantityA = new Quantity<T>(firstValue, firstUnit);
-            var quantityB = new Quantity<T>(secondValue, secondUnit);
+            Quantity<T> firstQuantity = new Quantity<T>(firstNumber, firstUnit);
+            Quantity<T> secondQuantity = new Quantity<T>(secondNumber, secondUnit);
 
-            bool isEqual = measurementService.Compare(quantityA, quantityB);
+            bool isSame = measurementService.Compare(firstQuantity, secondQuantity);
 
-            Console.WriteLine($"\nResult: {quantityA} {(isEqual ? "==" : "!=")} {quantityB}");
+            Console.WriteLine($"\nResult: {firstQuantity} {(isSame ? "==" : "!=")} {secondQuantity}");
         }
-        catch (Exception err)
+        catch (Exception error)
         {
-            Console.WriteLine("Error: " + err.Message);
+            Console.WriteLine("Error: " + error.Message);
         }
     }
 
-    private void ProcessConversion<T>(string unitsInfo) where T : struct, Enum
+    private void ProcessConversion<T>(string availableUnits) where T : struct, Enum
     {
         try
         {
-            Console.WriteLine(unitsInfo);
+            Console.WriteLine(availableUnits);
 
-            Console.Write("Enter value: ");
-            double inputValue = double.Parse(Console.ReadLine()!);
+            Console.Write("Enter Value: ");
+            double enteredValue = double.Parse(Console.ReadLine()!);
 
-            Console.Write("Source unit index: ");
-            T sourceUnit = (T)(object)int.Parse(Console.ReadLine()!);
+            Console.Write("Source Unit Index: ");
+            T fromUnit = (T)(object)int.Parse(Console.ReadLine()!);
 
-            Console.Write("Target unit index: ");
-            T destinationUnit = (T)(object)int.Parse(Console.ReadLine()!);
+            Console.Write("Target Unit Index: ");
+            T toUnit = (T)(object)int.Parse(Console.ReadLine()!);
 
-            var originalQuantity = new Quantity<T>(inputValue, sourceUnit);
-            var convertedQuantity = measurementService.DemonstrateConversion(originalQuantity, destinationUnit);
+            Quantity<T> originalQuantity = new Quantity<T>(enteredValue, fromUnit);
+            Quantity<T> convertedQuantity = measurementService.DemonstrateConversion(originalQuantity, toUnit);
 
             Console.WriteLine($"Result: {convertedQuantity}");
         }
-        catch (Exception err)
+        catch (Exception error)
         {
-            Console.WriteLine("Error: " + err.Message);
+            Console.WriteLine("Error: " + error.Message);
         }
     }
 
-    private void ProcessAddition<T>(string unitsInfo) where T : struct, Enum
+    private void ProcessAddition<T>(string availableUnits) where T : struct, Enum
     {
         try
         {
-            Console.WriteLine(unitsInfo);
+            Console.WriteLine(availableUnits);
 
-            Console.Write("Enter first value: ");
-            double valueOne = double.Parse(Console.ReadLine()!);
+            Console.Write("Value 1: ");
+            double numberOne = double.Parse(Console.ReadLine()!);
 
-            Console.Write("First unit index: ");
+            Console.Write("Unit 1 Index: ");
             T unitOne = (T)(object)int.Parse(Console.ReadLine()!);
 
-            Console.Write("Enter second value: ");
-            double valueTwo = double.Parse(Console.ReadLine()!);
+            Console.Write("Value 2: ");
+            double numberTwo = double.Parse(Console.ReadLine()!);
 
-            Console.Write("Second unit index: ");
+            Console.Write("Unit 2 Index: ");
             T unitTwo = (T)(object)int.Parse(Console.ReadLine()!);
 
-            var firstQuantity = new Quantity<T>(valueOne, unitOne);
-            var secondQuantity = new Quantity<T>(valueTwo, unitTwo);
+            Quantity<T> quantityA = new Quantity<T>(numberOne, unitOne);
+            Quantity<T> quantityB = new Quantity<T>(numberTwo, unitTwo);
 
-            Console.Write("Select target unit explicitly? (Y/N): ");
-            string response = Console.ReadLine() ?? "";
+            Console.Write("Explicit target selection (Y/N): ");
+            string? decision = Console.ReadLine();
 
-            if (response.ToLower() == "y")
+            if (decision != null && decision.ToLower() == "y")
             {
-                Console.Write("Target unit index: ");
-                T targetUnit = (T)(object)int.Parse(Console.ReadLine()!);
+                Console.Write("Target Unit Index: ");
+                T selectedUnit = (T)(object)int.Parse(Console.ReadLine()!);
 
-                var result = measurementService.DemonstrateAddition(firstQuantity, secondQuantity, targetUnit);
+                Quantity<T> result = measurementService.DemonstrateAddition(quantityA, quantityB, selectedUnit);
                 Console.WriteLine($"Result: {result}");
             }
             else
             {
-                var result = measurementService.DemonstrateAddition(firstQuantity, secondQuantity);
+                Quantity<T> result = measurementService.DemonstrateAddition(quantityA, quantityB);
                 Console.WriteLine($"Result: {result}");
             }
         }
-        catch (Exception err)
+        catch (Exception error)
         {
-            Console.WriteLine("Error: " + err.Message);
+            Console.WriteLine("Error: " + error.Message);
         }
     }
 }

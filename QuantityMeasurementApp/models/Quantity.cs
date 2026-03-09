@@ -1,26 +1,24 @@
 using System;
 using QuantityMeasurementApp.models;
+using QuantityMeasurementApp.Interface;
 
 namespace QuantityMeasurementApp.Models
 {
     /// <summary>
-    /// Represents a measurable quantity that can work with different unit types
-    /// such as Length or Weight. Only Enum types are allowed as units.
+    /// Generic representation of a measurable value.  
+    /// Works with different unit enums like Length, Weight, and Volume.
+    /// Only enum types are allowed as units.
     /// </summary>
-    public sealed class Quantity<TUnit>
-        where TUnit : struct, Enum
+    public sealed class Quantity<TUnit> where TUnit : struct, Enum
     {
-        // Used to compare floating-point values safely
-        private const double Tolerance = 1e-6;
+        // Small tolerance used when comparing floating-point numbers
+        private const double Precision = 1e-6;
 
-        /// <summary> Numeric value of the measurement. </summary>
         public double Value { get; }
-
-        /// <summary> Unit associated with the value. </summary>
         public TUnit Unit { get; }
 
         /// <summary>
-        /// Creates a new quantity with a given value and unit.
+        /// Creates a new quantity with the given value and unit.
         /// </summary>
         public Quantity(double amount, TUnit measurementUnit)
         {
@@ -32,9 +30,10 @@ namespace QuantityMeasurementApp.Models
         }
 
         /// <summary>
-        /// Converts the current quantity into its base unit form.
+        /// Converts the current value into its base representation
+        /// (for example: feet → inches, kg → grams).
         /// </summary>
-        private double GetBaseValue()
+        private double ConvertCurrentToBase()
         {
             if (Unit is LengthUnit lengthType)
                 return lengthType.ConvertToBase(Value);
@@ -42,25 +41,28 @@ namespace QuantityMeasurementApp.Models
             if (Unit is WeightUnit weightType)
                 return weightType.ConvertToBase(Value);
 
+            if (Unit is VolumeUnit volumeType)
+                return volumeType.ConvertToBase(Value);
+
             throw new InvalidOperationException("Unit type not supported.");
         }
 
         /// <summary>
-        /// Converts this quantity into another unit within the same category.
+        /// Converts this quantity into another unit of the same category.
         /// </summary>
         public Quantity<TUnit> ConvertTo(TUnit destinationUnit)
         {
-            double baseVal = GetBaseValue();
-            double resultValue;
+            double baseAmount = ConvertCurrentToBase();
+            double convertedValue = 0;
 
-            if (destinationUnit is LengthUnit len)
-                resultValue = LengthUnitExtensions.ConvertFromBase(len, baseVal);
-            else if (destinationUnit is WeightUnit wt)
-                resultValue = WeightUnitExtension.ConvertFromBase(wt, baseVal);
-            else
-                throw new InvalidOperationException("Unit type not supported.");
+            if (destinationUnit is LengthUnit lengthType)
+                convertedValue = LengthUnitExtensions.ConvertFromBase(lengthType, baseAmount);
+            else if (destinationUnit is WeightUnit weightType)
+                convertedValue = WeightUnitExtension.ConvertFromBase(weightType, baseAmount);
+            else if (destinationUnit is VolumeUnit volumeType)
+                convertedValue = VolumeUnitExtension.ConvertFromBase(volumeType, baseAmount);
 
-            return new Quantity<TUnit>(resultValue, destinationUnit);
+            return new Quantity<TUnit>(convertedValue, destinationUnit);
         }
 
         /// <summary>
@@ -72,56 +74,55 @@ namespace QuantityMeasurementApp.Models
         }
 
         /// <summary>
-        /// Adds two quantities and returns the result in the specified unit.
+        /// Adds two quantities and converts the result to a chosen unit.
         /// </summary>
         public Quantity<TUnit> Add(Quantity<TUnit> otherQuantity, TUnit outputUnit)
         {
-            double combinedBase = GetBaseValue() + otherQuantity.GetBaseValue();
-            double convertedResult;
+            double combinedBase = ConvertCurrentToBase() + otherQuantity.ConvertCurrentToBase();
+            double finalValue = 0;
 
-            if (outputUnit is LengthUnit len)
-                convertedResult = LengthUnitExtensions.ConvertFromBase(len, combinedBase);
-            else if (outputUnit is WeightUnit wt)
-                convertedResult = WeightUnitExtension.ConvertFromBase(wt, combinedBase);
-            else
-                throw new InvalidOperationException("Unit type not supported.");
+            if (outputUnit is LengthUnit lengthType)
+                finalValue = LengthUnitExtensions.ConvertFromBase(lengthType, combinedBase);
+            else if (outputUnit is WeightUnit weightType)
+                finalValue = WeightUnitExtension.ConvertFromBase(weightType, combinedBase);
+            else if (outputUnit is VolumeUnit volumeType)
+                finalValue = VolumeUnitExtension.ConvertFromBase(volumeType, combinedBase);
 
-            return new Quantity<TUnit>(convertedResult, outputUnit);
+            return new Quantity<TUnit>(finalValue, outputUnit);
         }
 
         /// <summary>
-        /// Compares two quantities by converting both to their base units.
+        /// Checks equality by comparing values in their base unit.
         /// </summary>
         public override bool Equals(object? obj)
         {
             if (obj is not Quantity<TUnit> otherQuantity)
                 return false;
 
-            double difference = Math.Abs(GetBaseValue() - otherQuantity.GetBaseValue());
-            return difference < Tolerance;
+            double difference = Math.Abs(ConvertCurrentToBase() - otherQuantity.ConvertCurrentToBase());
+            return difference < Precision;
         }
 
-        /// <summary>
-        /// Hash code based on the base unit value.
-        /// </summary>
         public override int GetHashCode()
         {
-            return GetBaseValue().GetHashCode();
+            return ConvertCurrentToBase().GetHashCode();
         }
 
         /// <summary>
-        /// Returns a readable string with value and unit symbol.
+        /// Returns the quantity formatted with its unit symbol.
         /// </summary>
         public override string ToString()
         {
-            string unitLabel = "";
+            string unitSymbol = "";
 
-            if (Unit is LengthUnit len)
-                unitLabel = len.GetSymbol();
-            else if (Unit is WeightUnit wt)
-                unitLabel = wt.GetSymbol();
+            if (Unit is LengthUnit lengthType)
+                unitSymbol = lengthType.GetSymbol();
+            else if (Unit is WeightUnit weightType)
+                unitSymbol = weightType.GetSymbol();
+            else if (Unit is VolumeUnit volumeType)
+                unitSymbol = volumeType.GetSymbol();
 
-            return $"{Value} {unitLabel}";
+            return $"{Value} {unitSymbol}";
         }
     }
 }
