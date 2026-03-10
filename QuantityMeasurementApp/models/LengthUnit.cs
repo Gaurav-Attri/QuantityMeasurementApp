@@ -1,8 +1,8 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Lists the length units supported in the system.
-    /// The order matters because the enum index maps to the conversion table.
+    /// Represents the different units used for length measurement.
+    /// The order is used internally for conversion calculations.
     /// </summary>
     public enum LengthUnit
     {
@@ -12,13 +12,10 @@ namespace QuantityMeasurementApp.models
         Centimeters
     }
 
-    /// <summary>
-    /// Helper utilities related to LengthUnit conversions and formatting.
-    /// </summary>
     public static class LengthUnitExtensions
     {
-        // Conversion multipliers relative to Inches (base unit)
-        private static readonly double[] inchMultiplier =
+        // Conversion multipliers relative to inches
+        private static readonly double[] conversionValues =
         {
             1.0,
             12.0,
@@ -26,28 +23,26 @@ namespace QuantityMeasurementApp.models
             0.393701
         };
 
-        public static double GetConversionFactor(this LengthUnit type)
+        public static double GetConversionFactor(this LengthUnit current)
         {
-            int index = (int)type;
-            return inchMultiplier[index];
+            return conversionValues[(int)current];
         }
 
-        public static double ConvertToBase(this LengthUnit type, double amount)
+        public static double ConvertToBase(this LengthUnit current, double number)
         {
-            double factor = type.GetConversionFactor();
-            return amount * factor;
+            double factor = current.GetConversionFactor();
+            return number * factor;
         }
 
-        public static double ConvertFromBase(this LengthUnit type, double baseAmount)
+        public static double ConvertFromBase(this LengthUnit current, double baseNumber)
         {
-            double factor = type.GetConversionFactor();
-            return baseAmount / factor;
+            double factor = current.GetConversionFactor();
+            return baseNumber / factor;
         }
 
-        // Returns readable symbol for display
-        public static string GetSymbol(this LengthUnit type)
+        public static string GetSymbol(this LengthUnit current)
         {
-            switch (type)
+            switch (current)
             {
                 case LengthUnit.Inches:
                     return "in";
@@ -62,7 +57,7 @@ namespace QuantityMeasurementApp.models
                     return "cm";
 
                 default:
-                    return type.ToString().ToLower();
+                    return current.ToString().ToLower();
             }
         }
     }

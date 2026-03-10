@@ -1,8 +1,7 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents the volume units used in the system.
-    /// The enum position is used to fetch the correct conversion multiplier.
+    /// Units available for measuring volume.
     /// </summary>
     public enum VolumeUnit
     {
@@ -11,43 +10,33 @@ namespace QuantityMeasurementApp.models
         Gallon
     }
 
-    /// <summary>
-    /// Utility functions for converting and formatting VolumeUnit values.
-    /// </summary>
     public static class VolumeUnitExtension
     {
-        // Conversion multipliers relative to the base unit (Litre)
-        private static readonly double[] litreScale =
+        private static readonly double[] litreMultipliers =
         {
-            1.0,       // Litre
-            0.001,     // Milliliter
-            3.78541    // Gallon
+            1.0,
+            0.001,
+            3.78541
         };
 
-        public static double GetConversionFactor(this VolumeUnit unitType)
+        public static double GetConversionFactor(this VolumeUnit unit)
         {
-            int position = (int)unitType;
-            return litreScale[position];
+            return litreMultipliers[(int)unit];
         }
 
-        // Convert a given value to the base unit (Litre)
-        public static double ConvertToBase(this VolumeUnit unitType, double amount)
+        public static double ConvertToBase(this VolumeUnit unit, double value)
         {
-            double factor = unitType.GetConversionFactor();
-            return amount * factor;
+            return value * unit.GetConversionFactor();
         }
 
-        // Convert a base unit value back into the desired unit
-        public static double ConvertFromBase(this VolumeUnit unitType, double baseAmount)
+        public static double ConvertFromBase(this VolumeUnit unit, double baseValue)
         {
-            double factor = unitType.GetConversionFactor();
-            return baseAmount / factor;
+            return baseValue / unit.GetConversionFactor();
         }
 
-        // Returns a short unit label used for display
-        public static string GetSymbol(this VolumeUnit unitType)
+        public static string GetSymbol(this VolumeUnit unit)
         {
-            switch (unitType)
+            switch (unit)
             {
                 case VolumeUnit.Litre:
                     return "L";
@@ -59,7 +48,7 @@ namespace QuantityMeasurementApp.models
                     return "gal";
 
                 default:
-                    return unitType.ToString().ToLower();
+                    return unit.ToString().ToLower();
             }
         }
     }

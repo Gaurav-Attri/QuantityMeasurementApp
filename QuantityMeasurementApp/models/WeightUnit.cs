@@ -8,50 +8,49 @@ namespace QuantityMeasurementApp.models
     }
 
     /// <summary>
-    /// Utility methods for handling weight unit conversions.
+    /// Contains helper methods for weight unit conversion.
     /// </summary>
     public static class WeightUnitExtension
     {
-        // Conversion multipliers relative to Kilograms (base)
-        private static readonly double[] kgMultiplier =
+        private static readonly double[] kgMultipliers =
         {
             0.001,
             1.0,
             0.453592
         };
 
-        public static double GetConversionFactor(this WeightUnit unitType)
+        public static double GetConversionFactor(this WeightUnit unit)
         {
-            return kgMultiplier[(int)unitType];
+            return kgMultipliers[(int)unit];
         }
 
-        public static double ConvertToBase(this WeightUnit unitType, double amount)
+        public static double ConvertToBase(this WeightUnit unit, double value)
         {
-            double factor = unitType.GetConversionFactor();
-            return amount * factor;
+            double factor = unit.GetConversionFactor();
+            return value * factor;
         }
 
-        public static double ConvertFromBase(this WeightUnit unitType, double baseAmount)
+        public static double ConvertFromBase(this WeightUnit unit, double baseValue)
         {
-            double factor = unitType.GetConversionFactor();
-            return baseAmount / factor;
+            double factor = unit.GetConversionFactor();
+            return baseValue / factor;
         }
 
-        public static string GetSymbol(this WeightUnit unitType)
+        public static string GetSymbol(this WeightUnit unit)
         {
-            switch (unitType)
+            switch (unit)
             {
-                case WeightUnit.Grams:
-                    return "g";
-
                 case WeightUnit.Kilograms:
                     return "Kg";
+
+                case WeightUnit.Grams:
+                    return "g";
 
                 case WeightUnit.Pound:
                     return "lb";
 
                 default:
-                    return unitType.ToString().ToLower();
+                    return unit.ToString().ToLower();
             }
         }
     }
