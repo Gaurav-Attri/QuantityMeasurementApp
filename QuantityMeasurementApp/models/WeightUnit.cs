@@ -8,11 +8,12 @@ namespace QuantityMeasurementApp.models
     }
 
     /// <summary>
-    /// Contains helper methods for weight unit conversion.
+    /// Helper methods for weight unit conversions.
+    /// Base unit used internally is kilogram.
     /// </summary>
     public static class WeightUnitExtension
     {
-        private static readonly double[] kgMultipliers =
+        private static readonly double[] BaseFactors =
         {
             0.001,
             1.0,
@@ -21,36 +22,27 @@ namespace QuantityMeasurementApp.models
 
         public static double GetConversionFactor(this WeightUnit unit)
         {
-            return kgMultipliers[(int)unit];
+            return BaseFactors[(int)unit];
         }
 
-        public static double ConvertToBase(this WeightUnit unit, double value)
+        public static double ConvertToBase(this WeightUnit unit, double amount)
         {
-            double factor = unit.GetConversionFactor();
-            return value * factor;
+            return amount * unit.GetConversionFactor();
         }
 
         public static double ConvertFromBase(this WeightUnit unit, double baseValue)
         {
-            double factor = unit.GetConversionFactor();
-            return baseValue / factor;
+            return baseValue / unit.GetConversionFactor();
         }
 
         public static string GetSymbol(this WeightUnit unit)
         {
             switch (unit)
             {
-                case WeightUnit.Kilograms:
-                    return "Kg";
-
-                case WeightUnit.Grams:
-                    return "g";
-
-                case WeightUnit.Pound:
-                    return "lb";
-
-                default:
-                    return unit.ToString().ToLower();
+                case WeightUnit.Grams: return "g";
+                case WeightUnit.Kilograms: return "Kg";
+                case WeightUnit.Pound: return "lb";
+                default: return unit.ToString().ToLower();
             }
         }
     }

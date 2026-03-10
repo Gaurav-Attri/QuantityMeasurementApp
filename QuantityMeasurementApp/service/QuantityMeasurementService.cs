@@ -4,59 +4,79 @@ using QuantityMeasurementApp.Models;
 namespace QuantityMeasurementApp.Services
 {
     /// <summary>
-    /// Service layer responsible for coordinating quantity operations
-    /// such as comparison, conversion and arithmetic calculations.
+    /// Provides helper operations for working with Quantity objects.
+    /// It exposes simple methods for comparison, conversion and arithmetic.
     /// </summary>
     public class QuantityMeasurementService
     {
-        // Compare two quantities belonging to the same measurement category
-        public bool Compare<U>(Quantity<U> first, Quantity<U> second) where U : struct, Enum
+        /// <summary>
+        /// Checks whether two quantities represent the same value.
+        /// </summary>
+        public bool Compare<U>(Quantity<U> firstQuantity, Quantity<U> secondQuantity) where U : struct, Enum
         {
-            if (first == null || second == null)
+            if (firstQuantity == null || secondQuantity == null)
                 return false;
 
-            return first.Equals(second);
+            return firstQuantity.Equals(secondQuantity);
         }
 
-        // Converts a raw value from one unit to another
-        public double DemonstrateConversion<U>(double number, U fromUnit, U toUnit) where U : struct, Enum
+        /// <summary>
+        /// Converts a raw numeric value from one unit to another.
+        /// </summary>
+        public double DemonstrateConversion<U>(double numericValue, U sourceType, U targetType) where U : struct, Enum
         {
-            Quantity<U> original = new Quantity<U>(number, fromUnit);
-            Quantity<U> converted = original.ConvertTo(toUnit);
+            Quantity<U> tempQuantity = new Quantity<U>(numericValue, sourceType);
+            Quantity<U> converted = tempQuantity.ConvertTo(targetType);
+
             return converted.Value;
         }
 
-        // Converts an already created Quantity object
-        public Quantity<U> DemonstrateConversion<U>(Quantity<U> sourceQuantity, U target) where U : struct, Enum
+        /// <summary>
+        /// Converts an existing Quantity instance to a different unit.
+        /// </summary>
+        public Quantity<U> DemonstrateConversion<U>(Quantity<U> originalQuantity, U desiredUnit) where U : struct, Enum
         {
-            return sourceQuantity.ConvertTo(target);
+            Quantity<U> resultQuantity = originalQuantity.ConvertTo(desiredUnit);
+            return resultQuantity;
         }
 
-        // Adds two quantities and keeps the unit of the first operand
-        public Quantity<U> DemonstrateAddition<U>(Quantity<U> left, Quantity<U> right) where U : struct, Enum
+        /// <summary>
+        /// Adds two quantities and returns the sum.
+        /// </summary>
+        public Quantity<U> DemonstrateAddition<U>(Quantity<U> leftOperand, Quantity<U> rightOperand) where U : struct, Enum
         {
-            return left.Add(right);
+            Quantity<U> sum = leftOperand.Add(rightOperand);
+            return sum;
         }
 
-        // Addition with explicit result unit
-        public Quantity<U> DemonstrateAddition<U>(Quantity<U> left, Quantity<U> right, U desiredUnit) where U : struct, Enum
+        /// <summary>
+        /// Adds two quantities and converts the result to a chosen unit.
+        /// </summary>
+        public Quantity<U> DemonstrateAddition<U>(Quantity<U> leftOperand, Quantity<U> rightOperand, U resultUnit) where U : struct, Enum
         {
-            return left.Add(right, desiredUnit);
+            Quantity<U> result = leftOperand.Add(rightOperand, resultUnit);
+            return result;
         }
 
-        // Performs subtraction
-        public Quantity<U> Subtract<U>(Quantity<U> left, Quantity<U> right, U resultUnit) where U : struct, Enum
+        /// <summary>
+        /// Performs subtraction between two quantities.
+        /// </summary>
+        public Quantity<U> Subtract<U>(Quantity<U> firstValue, Quantity<U> secondValue, U resultUnit) where U : struct, Enum
         {
-            return left.Subtract(right, resultUnit);
+            Quantity<U> difference = firstValue.Subtract(secondValue, resultUnit);
+            return difference;
         }
 
-        // Divides two quantities and returns a scalar ratio
+        /// <summary>
+        /// Divides one quantity by another and returns the ratio.
+        /// </summary>
         public double Divide<T>(double firstValue, T firstUnit, double secondValue, T secondUnit) where T : struct, Enum
         {
-            Quantity<T> qA = new Quantity<T>(firstValue, firstUnit);
-            Quantity<T> qB = new Quantity<T>(secondValue, secondUnit);
+            Quantity<T> dividend = new Quantity<T>(firstValue, firstUnit);
+            Quantity<T> divisor = new Quantity<T>(secondValue, secondUnit);
 
-            return qA.Divide(qB);
+            double outcome = dividend.Divide(divisor);
+            return outcome;
         }
     }
 }

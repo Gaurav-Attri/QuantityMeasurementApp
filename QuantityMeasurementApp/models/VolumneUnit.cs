@@ -1,7 +1,7 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Units available for measuring volume.
+    /// Volume measurement units. Liter is used as the base.
     /// </summary>
     public enum VolumeUnit
     {
@@ -12,7 +12,7 @@ namespace QuantityMeasurementApp.models
 
     public static class VolumeUnitExtension
     {
-        private static readonly double[] litreMultipliers =
+        private static readonly double[] ConversionFactors =
         {
             1.0,
             0.001,
@@ -21,12 +21,12 @@ namespace QuantityMeasurementApp.models
 
         public static double GetConversionFactor(this VolumeUnit unit)
         {
-            return litreMultipliers[(int)unit];
+            return ConversionFactors[(int)unit];
         }
 
-        public static double ConvertToBase(this VolumeUnit unit, double value)
+        public static double ConvertToBase(this VolumeUnit unit, double amount)
         {
-            return value * unit.GetConversionFactor();
+            return amount * unit.GetConversionFactor();
         }
 
         public static double ConvertFromBase(this VolumeUnit unit, double baseValue)
@@ -38,17 +38,10 @@ namespace QuantityMeasurementApp.models
         {
             switch (unit)
             {
-                case VolumeUnit.Litre:
-                    return "L";
-
-                case VolumeUnit.MilliLiter:
-                    return "ML";
-
-                case VolumeUnit.Gallon:
-                    return "gal";
-
-                default:
-                    return unit.ToString().ToLower();
+                case VolumeUnit.Litre: return "L";
+                case VolumeUnit.MilliLiter: return "ML";
+                case VolumeUnit.Gallon: return "gal";
+                default: return unit.ToString().ToLower();
             }
         }
     }

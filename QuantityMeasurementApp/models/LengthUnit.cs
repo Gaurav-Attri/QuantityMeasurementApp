@@ -1,8 +1,8 @@
 namespace QuantityMeasurementApp.models
 {
     /// <summary>
-    /// Represents the different units used for length measurement.
-    /// The order is used internally for conversion calculations.
+    /// Units supported for length measurement.
+    /// The base unit used internally is inches.
     /// </summary>
     public enum LengthUnit
     {
@@ -14,8 +14,7 @@ namespace QuantityMeasurementApp.models
 
     public static class LengthUnitExtensions
     {
-        // Conversion multipliers relative to inches
-        private static readonly double[] conversionValues =
+        private static readonly double[] BaseFactors =
         {
             1.0,
             12.0,
@@ -23,41 +22,30 @@ namespace QuantityMeasurementApp.models
             0.393701
         };
 
-        public static double GetConversionFactor(this LengthUnit current)
+        public static double GetConversionFactor(this LengthUnit unit)
         {
-            return conversionValues[(int)current];
+            return BaseFactors[(int)unit];
         }
 
-        public static double ConvertToBase(this LengthUnit current, double number)
+        public static double ConvertToBase(this LengthUnit unit, double amount)
         {
-            double factor = current.GetConversionFactor();
-            return number * factor;
+            return amount * unit.GetConversionFactor();
         }
 
-        public static double ConvertFromBase(this LengthUnit current, double baseNumber)
+        public static double ConvertFromBase(this LengthUnit unit, double baseValue)
         {
-            double factor = current.GetConversionFactor();
-            return baseNumber / factor;
+            return baseValue / unit.GetConversionFactor();
         }
 
-        public static string GetSymbol(this LengthUnit current)
+        public static string GetSymbol(this LengthUnit unit)
         {
-            switch (current)
+            switch (unit)
             {
-                case LengthUnit.Inches:
-                    return "in";
-
-                case LengthUnit.Feet:
-                    return "ft";
-
-                case LengthUnit.Yards:
-                    return "yd";
-
-                case LengthUnit.Centimeters:
-                    return "cm";
-
-                default:
-                    return current.ToString().ToLower();
+                case LengthUnit.Inches: return "in";
+                case LengthUnit.Feet: return "ft";
+                case LengthUnit.Yards: return "yd";
+                case LengthUnit.Centimeters: return "cm";
+                default: return unit.ToString().ToLower();
             }
         }
     }
