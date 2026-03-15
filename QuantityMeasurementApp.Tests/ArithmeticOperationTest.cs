@@ -1,7 +1,8 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuantityMeasurementApp.models;
-using QuantityMeasurementApp.Models;
+using ModelLayer.Enums;
+using ModelLayer.Models;
+using BusinessLayer.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
@@ -13,8 +14,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Subtract_FeetMinusFeet_ReturnsCorrectDifference()
         {
-            var firstQuantity = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
-            var secondQuantity = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            var firstQuantity = new Quantity<LengthUnit>(10.0, LengthUnit.Feet, new LengthUnitConverter());
+            var secondQuantity = new Quantity<LengthUnit>(5.0, LengthUnit.Feet, new LengthUnitConverter());
 
             var result = firstQuantity.Subtract(secondQuantity);
 
@@ -25,9 +26,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Subtract_FeetAndInches_ShouldNormalizeResult()
         {
-            // 10 ft - 6 in = 9.5 ft
-            var left = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
-            var right = new Quantity<LengthUnit>(6.0, LengthUnit.Inches);
+            var left = new Quantity<LengthUnit>(10.0, LengthUnit.Feet, new LengthUnitConverter());
+            var right = new Quantity<LengthUnit>(6.0, LengthUnit.Inches, new LengthUnitConverter());
 
             var output = left.Subtract(right);
 
@@ -37,8 +37,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Subtract_LitreValues_ToMillilitres()
         {
-            var first = new Quantity<VolumeUnit>(5.0, VolumeUnit.Litre);
-            var second = new Quantity<VolumeUnit>(2.0, VolumeUnit.Litre);
+            var first = new Quantity<VolumeUnit>(5.0, VolumeUnit.Litre, new VolumeUnitConverter());
+            var second = new Quantity<VolumeUnit>(2.0, VolumeUnit.Litre, new VolumeUnitConverter());
 
             var answer = first.Subtract(second, VolumeUnit.MilliLiter);
 
@@ -49,8 +49,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Subtract_WhenResultIsNegative_ShouldKeepSign()
         {
-            var smaller = new Quantity<WeightUnit>(2.0, WeightUnit.Kilograms);
-            var larger = new Quantity<WeightUnit>(5.0, WeightUnit.Kilograms);
+            var smaller = new Quantity<WeightUnit>(2.0, WeightUnit.Kilograms, new WeightUnitConverter());
+            var larger = new Quantity<WeightUnit>(5.0, WeightUnit.Kilograms, new WeightUnitConverter());
 
             var diff = smaller.Subtract(larger);
 
@@ -60,8 +60,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Subtract_OrderMatters_ShouldProduceDifferentResults()
         {
-            var a = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
-            var b = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
+            var a = new Quantity<LengthUnit>(10.0, LengthUnit.Feet, new LengthUnitConverter());
+            var b = new Quantity<LengthUnit>(5.0, LengthUnit.Feet, new LengthUnitConverter());
 
             double firstResult = a.Subtract(b).Value;
             double secondResult = b.Subtract(a).Value;
@@ -72,8 +72,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Subtract_WithZeroOperand_ShouldReturnSameValue()
         {
-            var baseValue = new Quantity<LengthUnit>(5.0, LengthUnit.Feet);
-            var zeroValue = new Quantity<LengthUnit>(0.0, LengthUnit.Inches);
+            var baseValue = new Quantity<LengthUnit>(5.0, LengthUnit.Feet, new LengthUnitConverter());
+            var zeroValue = new Quantity<LengthUnit>(0.0, LengthUnit.Inches, new LengthUnitConverter());
 
             var output = baseValue.Subtract(zeroValue);
 
@@ -83,8 +83,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Divide_SameUnits_ShouldReturnExpectedRatio()
         {
-            var numerator = new Quantity<WeightUnit>(10.0, WeightUnit.Kilograms);
-            var denominator = new Quantity<WeightUnit>(2.0, WeightUnit.Kilograms);
+            var numerator = new Quantity<WeightUnit>(10.0, WeightUnit.Kilograms, new WeightUnitConverter());
+            var denominator = new Quantity<WeightUnit>(2.0, WeightUnit.Kilograms, new WeightUnitConverter());
 
             double ratio = numerator.Divide(denominator);
 
@@ -94,8 +94,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Divide_InchesByFeet_ShouldNormalizeCorrectly()
         {
-            var inchesValue = new Quantity<LengthUnit>(24.0, LengthUnit.Inches);
-            var feetValue = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
+            var inchesValue = new Quantity<LengthUnit>(24.0, LengthUnit.Inches, new LengthUnitConverter());
+            var feetValue = new Quantity<LengthUnit>(2.0, LengthUnit.Feet, new LengthUnitConverter());
 
             double result = inchesValue.Divide(feetValue);
 
@@ -105,8 +105,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Divide_ByZeroQuantity_ShouldThrowArithmeticException()
         {
-            var numerator = new Quantity<VolumeUnit>(10.0, VolumeUnit.Litre);
-            var zeroDenominator = new Quantity<VolumeUnit>(0.0, VolumeUnit.Litre);
+            var numerator = new Quantity<VolumeUnit>(10.0, VolumeUnit.Litre, new VolumeUnitConverter());
+            var zeroDenominator = new Quantity<VolumeUnit>(0.0, VolumeUnit.Litre, new VolumeUnitConverter());
 
             try
             {
@@ -115,7 +115,6 @@ namespace QuantityMeasurementApp.Tests
             }
             catch (ArithmeticException)
             {
-                // Expected behavior
                 Assert.IsTrue(true);
             }
         }
@@ -123,8 +122,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Subtract_ShouldNotModifyOriginalObject()
         {
-            var original = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
-            var deduction = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
+            var original = new Quantity<LengthUnit>(10.0, LengthUnit.Feet, new LengthUnitConverter());
+            var deduction = new Quantity<LengthUnit>(2.0, LengthUnit.Feet, new LengthUnitConverter());
 
             original.Subtract(deduction);
 
@@ -134,8 +133,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void AddThenSubtract_ShouldReturnInitialValue()
         {
-            var start = new Quantity<LengthUnit>(10.0, LengthUnit.Feet);
-            var delta = new Quantity<LengthUnit>(2.0, LengthUnit.Feet);
+            var start = new Quantity<LengthUnit>(10.0, LengthUnit.Feet, new LengthUnitConverter());
+            var delta = new Quantity<LengthUnit>(2.0, LengthUnit.Feet, new LengthUnitConverter());
 
             var result = start.Add(delta).Subtract(delta);
 

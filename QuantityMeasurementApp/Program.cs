@@ -1,24 +1,26 @@
-﻿using System;
+﻿using QuantityMeasurementApp.Factories;
+using QuantityMeasurementApp.Interfaces;
 
 namespace QuantityMeasurementApp
 {
     /// <summary>
-    /// Bootstraps the console application.
+    /// Entry point of the Quantity Measurement application.
+    /// Initializes required components using the factory pattern
+    /// and starts the application menu.
     /// </summary>
     internal class Program
     {
         /// <summary>
-        /// Application starting method.
+        /// Application starting point. Creates the menu using MenuFactory
+        /// and runs the main application menu.
         /// </summary>
-        private static void Main(string[] arguments)
+        private static void Main(string[] args)
         {
-            LaunchApplication();
-        }
+            IMenuFactory factory = new MenuFactory();
 
-        private static void LaunchApplication()
-        {
-            var appMenu = new QuantityMeasurementAppMenu();
-            appMenu.Run();
+            IQuantityMeasurementAppMenu menu = factory.CreateMenu();
+
+            menu.Run();
         }
     }
 }

@@ -1,22 +1,19 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuantityMeasurementApp.models;
-using QuantityMeasurementApp.Models;
+using ModelLayer.Enums;
+using ModelLayer.Models;
+using BusinessLayer.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
-    /// <summary>
-    /// Tests to verify the behavior of the generic Quantity model.
-    /// Covers equality, conversions, addition, and validation cases.
-    /// </summary>
     [TestClass]
     public class GenericQuantityTests
     {
         [TestMethod]
         public void LengthEquality_FeetAndInches_ShouldMatch()
         {
-            var lengthA = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
-            var lengthB = new Quantity<LengthUnit>(12.0, LengthUnit.Inches);
+            var lengthA = new Quantity<LengthUnit>(1.0, LengthUnit.Feet, new LengthUnitConverter());
+            var lengthB = new Quantity<LengthUnit>(12.0, LengthUnit.Inches, new LengthUnitConverter());
 
             Assert.IsTrue(lengthA.Equals(lengthB));
         }
@@ -24,8 +21,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void WeightEquality_KgAndGrams_ShouldMatch()
         {
-            var weightA = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms);
-            var weightB = new Quantity<WeightUnit>(1000.0, WeightUnit.Grams);
+            var weightA = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms, new WeightUnitConverter());
+            var weightB = new Quantity<WeightUnit>(1000.0, WeightUnit.Grams, new WeightUnitConverter());
 
             Assert.IsTrue(weightA.Equals(weightB));
         }
@@ -33,7 +30,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void LengthConversion_FeetToInches()
         {
-            var source = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            var source = new Quantity<LengthUnit>(1.0, LengthUnit.Feet, new LengthUnitConverter());
             var converted = source.ConvertTo(LengthUnit.Inches);
 
             Assert.AreEqual(12.0, converted.Value, 1e-6);
@@ -43,7 +40,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void WeightConversion_KgToGrams()
         {
-            var input = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms);
+            var input = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms, new WeightUnitConverter());
             var result = input.ConvertTo(WeightUnit.Grams);
 
             Assert.AreEqual(1000.0, result.Value, 1e-6);
@@ -52,8 +49,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void LengthAddition_FeetAndInches()
         {
-            var a = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
-            var b = new Quantity<LengthUnit>(12.0, LengthUnit.Inches);
+            var a = new Quantity<LengthUnit>(1.0, LengthUnit.Feet, new LengthUnitConverter());
+            var b = new Quantity<LengthUnit>(12.0, LengthUnit.Inches, new LengthUnitConverter());
 
             var total = a.Add(b, LengthUnit.Feet);
 
@@ -64,8 +61,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void WeightAddition_GramsAndKg()
         {
-            var first = new Quantity<WeightUnit>(1000.0, WeightUnit.Grams);
-            var second = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms);
+            var first = new Quantity<WeightUnit>(1000.0, WeightUnit.Grams, new WeightUnitConverter());
+            var second = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms, new WeightUnitConverter());
 
             var result = first.Add(second, WeightUnit.Kilograms);
 
@@ -75,8 +72,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void CrossCategoryComparison_ShouldReturnFalse()
         {
-            var distance = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
-            var mass = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms);
+            var distance = new Quantity<LengthUnit>(1.0, LengthUnit.Feet, new LengthUnitConverter());
+            var mass = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms, new WeightUnitConverter());
 
             Assert.IsFalse(distance.Equals(mass));
         }
@@ -88,7 +85,7 @@ namespace QuantityMeasurementApp.Tests
 
             try
             {
-                new Quantity<LengthUnit>(double.NaN, LengthUnit.Feet);
+                new Quantity<LengthUnit>(double.NaN, LengthUnit.Feet, new LengthUnitConverter());
             }
             catch (ArgumentException)
             {
@@ -101,7 +98,7 @@ namespace QuantityMeasurementApp.Tests
 
             try
             {
-                new Quantity<LengthUnit>(double.PositiveInfinity, LengthUnit.Inches);
+                new Quantity<LengthUnit>(double.PositiveInfinity, LengthUnit.Inches, new LengthUnitConverter());
             }
             catch (ArgumentException)
             {
@@ -114,7 +111,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void ToString_ShouldContainSymbol()
         {
-            var sample = new Quantity<LengthUnit>(5.0, LengthUnit.Inches);
+            var sample = new Quantity<LengthUnit>(5.0, LengthUnit.Inches, new LengthUnitConverter());
 
             string text = sample.ToString();
 
@@ -125,8 +122,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void ZeroValuesAcrossUnits_ShouldBeEqual()
         {
-            var zeroFeet = new Quantity<LengthUnit>(0.0, LengthUnit.Feet);
-            var zeroInches = new Quantity<LengthUnit>(0.0, LengthUnit.Inches);
+            var zeroFeet = new Quantity<LengthUnit>(0.0, LengthUnit.Feet, new LengthUnitConverter());
+            var zeroInches = new Quantity<LengthUnit>(0.0, LengthUnit.Inches, new LengthUnitConverter());
 
             Assert.IsTrue(zeroFeet.Equals(zeroInches));
         }
@@ -134,8 +131,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void LargeValues_AdditionShouldRemainCorrect()
         {
-            var large = new Quantity<WeightUnit>(1000000.0, WeightUnit.Kilograms);
-            var small = new Quantity<WeightUnit>(1.0, WeightUnit.Grams);
+            var large = new Quantity<WeightUnit>(1000000.0, WeightUnit.Kilograms, new WeightUnitConverter());
+            var small = new Quantity<WeightUnit>(1.0, WeightUnit.Grams, new WeightUnitConverter());
 
             var result = large.Add(small, WeightUnit.Grams);
 
@@ -145,8 +142,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void PrecisionCheck_CloseValuesShouldBeEqual()
         {
-            var first = new Quantity<LengthUnit>(1.0, LengthUnit.Inches);
-            var second = new Quantity<LengthUnit>(1.0000001, LengthUnit.Inches);
+            var first = new Quantity<LengthUnit>(1.0, LengthUnit.Inches, new LengthUnitConverter());
+            var second = new Quantity<LengthUnit>(1.0000001, LengthUnit.Inches, new LengthUnitConverter());
 
             Assert.IsTrue(first.Equals(second));
         }
@@ -154,8 +151,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void NegativeValues_Addition()
         {
-            var positive = new Quantity<LengthUnit>(10.0, LengthUnit.Inches);
-            var negative = new Quantity<LengthUnit>(-5.0, LengthUnit.Inches);
+            var positive = new Quantity<LengthUnit>(10.0, LengthUnit.Inches, new LengthUnitConverter());
+            var negative = new Quantity<LengthUnit>(-5.0, LengthUnit.Inches, new LengthUnitConverter());
 
             var result = positive.Add(negative);
 
@@ -165,7 +162,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Equality_Reflexive()
         {
-            var item = new Quantity<WeightUnit>(500.0, WeightUnit.Grams);
+            var item = new Quantity<WeightUnit>(500.0, WeightUnit.Grams, new WeightUnitConverter());
 
             Assert.IsTrue(item.Equals(item));
         }
@@ -173,7 +170,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void Equality_WithNull_ShouldReturnFalse()
         {
-            var sample = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            var sample = new Quantity<LengthUnit>(1.0, LengthUnit.Feet, new LengthUnitConverter());
 
             Assert.IsFalse(sample.Equals(null));
         }
@@ -181,8 +178,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void HashCode_ForEquivalentValues_ShouldMatch()
         {
-            var a = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
-            var b = new Quantity<LengthUnit>(12.0, LengthUnit.Inches);
+            var a = new Quantity<LengthUnit>(1.0, LengthUnit.Feet, new LengthUnitConverter());
+            var b = new Quantity<LengthUnit>(12.0, LengthUnit.Inches, new LengthUnitConverter());
 
             Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
         }

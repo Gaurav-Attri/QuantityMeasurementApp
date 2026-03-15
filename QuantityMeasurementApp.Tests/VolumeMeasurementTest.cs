@@ -1,7 +1,8 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuantityMeasurementApp.models;
-using QuantityMeasurementApp.Models;
 using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ModelLayer.Enums;
+using ModelLayer.Models;
+using BusinessLayer.Services;
 
 namespace QuantityMeasurementApp.Tests
 {
@@ -10,13 +11,13 @@ namespace QuantityMeasurementApp.Tests
     {
         private const double tolerance = 1e-6;
 
-        // -------- Equality Tests --------
+        private readonly VolumeUnitConverter converter = new VolumeUnitConverter();
 
         [TestMethod]
         public void testEquality_LitreToLitre_SameValue_ShouldReturnTrue()
         {
-            var firstVolume = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
-            var secondVolume = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
+            var firstVolume = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre, converter);
+            var secondVolume = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre, converter);
 
             bool comparison = firstVolume.Equals(secondVolume);
 
@@ -26,9 +27,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testEquality_LitreToML_EquivalentValue_ShouldReturnTrue()
         {
-            // 1 L = 1000 mL
-            var litreQuantity = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
-            var mlQuantity = new Quantity<VolumeUnit>(1000.0, VolumeUnit.MilliLiter);
+            var litreQuantity = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre, converter);
+            var mlQuantity = new Quantity<VolumeUnit>(1000.0, VolumeUnit.MilliLiter, converter);
 
             Assert.IsTrue(litreQuantity.Equals(mlQuantity));
         }
@@ -36,20 +36,17 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testEquality_LitreToGallon_EquivalentValue_ShouldReturnTrue()
         {
-            // 3.78541 L equals 1 gallon
-            var litreAmount = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre);
-            var gallonAmount = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon);
+            var litreAmount = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre, converter);
+            var gallonAmount = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon, converter);
 
             bool result = litreAmount.Equals(gallonAmount);
             Assert.IsTrue(result);
         }
 
-        // -------- Conversion Tests --------
-
         [TestMethod]
         public void testConversion_LitreToML_ShouldReturnCorrectValue()
         {
-            var litreInput = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
+            var litreInput = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre, converter);
 
             Quantity<VolumeUnit> converted = litreInput.ConvertTo(VolumeUnit.MilliLiter);
 
@@ -60,21 +57,18 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testConversion_GallonToLitre_ShouldReturnCorrectValue()
         {
-            var gallonInput = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon);
+            var gallonInput = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon, converter);
 
             Quantity<VolumeUnit> convertedValue = gallonInput.ConvertTo(VolumeUnit.Litre);
 
             Assert.AreEqual(3.78541, convertedValue.Value, tolerance);
         }
 
-        // -------- Addition Tests --------
-
         [TestMethod]
         public void testAddition_LitreAndML_ShouldReturnSumInLitre()
         {
-            // 1L + 1000mL = 2L
-            var first = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
-            var second = new Quantity<VolumeUnit>(1000.0, VolumeUnit.MilliLiter);
+            var first = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre, converter);
+            var second = new Quantity<VolumeUnit>(1000.0, VolumeUnit.MilliLiter, converter);
 
             Quantity<VolumeUnit> total = first.Add(second);
 
@@ -84,22 +78,19 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testAddition_LitreAndGallon_ExplicitTarget_ShouldReturnSumInGallon()
         {
-            // 3.78541L + 1 gallon = 2 gallons
-            var partOne = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre);
-            var partTwo = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon);
+            var partOne = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre, converter);
+            var partTwo = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon, converter);
 
             Quantity<VolumeUnit> outcome = partOne.Add(partTwo, VolumeUnit.Gallon);
 
             Assert.AreEqual(2.0, outcome.Value, tolerance);
         }
 
-        // -------- Cross Type Equality --------
-
         [TestMethod]
         public void testEquality_VolumeVsLength_ShouldReturnFalse()
         {
-            var volumeValue = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
-            var lengthValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet);
+            var volumeValue = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre, converter);
+            var lengthValue = new Quantity<LengthUnit>(1.0, LengthUnit.Feet, new LengthUnitConverter());
 
             bool check = volumeValue.Equals(lengthValue);
 
@@ -109,19 +100,17 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testEquality_VolumeVsWeight_ShouldReturnFalse()
         {
-            var volumeSample = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre);
-            var weightSample = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms);
+            var volumeSample = new Quantity<VolumeUnit>(1.0, VolumeUnit.Litre, converter);
+            var weightSample = new Quantity<WeightUnit>(1.0, WeightUnit.Kilograms, new WeightUnitConverter());
 
             Assert.IsFalse(volumeSample.Equals(weightSample));
         }
 
-        // -------- Edge Cases --------
-
         [TestMethod]
         public void testZeroValue_AcrossVolumeUnits_ShouldBeEqual()
         {
-            var zeroLitres = new Quantity<VolumeUnit>(0.0, VolumeUnit.Litre);
-            var zeroGallons = new Quantity<VolumeUnit>(0.0, VolumeUnit.Gallon);
+            var zeroLitres = new Quantity<VolumeUnit>(0.0, VolumeUnit.Litre, converter);
+            var zeroGallons = new Quantity<VolumeUnit>(0.0, VolumeUnit.Gallon, converter);
 
             Assert.IsTrue(zeroLitres.Equals(zeroGallons));
         }
@@ -129,8 +118,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testSymmetricEquality_GallonToLitre_ShouldBeSameBothWays()
         {
-            var gallonUnit = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon);
-            var litreUnit = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre);
+            var gallonUnit = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon, converter);
+            var litreUnit = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre, converter);
 
             Assert.IsTrue(gallonUnit.Equals(litreUnit));
             Assert.IsTrue(litreUnit.Equals(gallonUnit));
@@ -139,9 +128,9 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testTransitiveEquality_GallonToLitreToML()
         {
-            var gallonVal = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon);
-            var litreVal = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre);
-            var mlVal = new Quantity<VolumeUnit>(3785.41, VolumeUnit.MilliLiter);
+            var gallonVal = new Quantity<VolumeUnit>(1.0, VolumeUnit.Gallon, converter);
+            var litreVal = new Quantity<VolumeUnit>(3.78541, VolumeUnit.Litre, converter);
+            var mlVal = new Quantity<VolumeUnit>(3785.41, VolumeUnit.MilliLiter, converter);
 
             Assert.IsTrue(gallonVal.Equals(litreVal));
             Assert.IsTrue(litreVal.Equals(mlVal));
@@ -151,7 +140,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testLargeVolume_ConversionPrecision()
         {
-            var largeInput = new Quantity<VolumeUnit>(1000000.0, VolumeUnit.Litre);
+            var largeInput = new Quantity<VolumeUnit>(1000000.0, VolumeUnit.Litre, converter);
 
             Quantity<VolumeUnit> result = largeInput.ConvertTo(VolumeUnit.MilliLiter);
 
@@ -161,8 +150,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testSmallVolume_MillLitreToGallon()
         {
-            // 1 mL ≈ 0.000264172 gallons
-            var tinyVolume = new Quantity<VolumeUnit>(1.0, VolumeUnit.MilliLiter);
+            var tinyVolume = new Quantity<VolumeUnit>(1.0, VolumeUnit.MilliLiter, converter);
 
             Quantity<VolumeUnit> converted = tinyVolume.ConvertTo(VolumeUnit.Gallon);
 
@@ -172,8 +160,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testNegativeVolume_Addition()
         {
-            var positivePart = new Quantity<VolumeUnit>(5.0, VolumeUnit.Litre);
-            var negativePart = new Quantity<VolumeUnit>(-2.0, VolumeUnit.Litre);
+            var positivePart = new Quantity<VolumeUnit>(5.0, VolumeUnit.Litre, converter);
+            var negativePart = new Quantity<VolumeUnit>(-2.0, VolumeUnit.Litre, converter);
 
             Quantity<VolumeUnit> result = positivePart.Add(negativePart);
 
@@ -183,8 +171,8 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testAddition_WithZero_ShouldReturnOriginalValue()
         {
-            var baseQuantity = new Quantity<VolumeUnit>(10.0, VolumeUnit.Gallon);
-            var zeroQuantity = new Quantity<VolumeUnit>(0.0, VolumeUnit.MilliLiter);
+            var baseQuantity = new Quantity<VolumeUnit>(10.0, VolumeUnit.Gallon, converter);
+            var zeroQuantity = new Quantity<VolumeUnit>(0.0, VolumeUnit.MilliLiter, converter);
 
             Quantity<VolumeUnit> result = baseQuantity.Add(zeroQuantity);
 
@@ -195,7 +183,7 @@ namespace QuantityMeasurementApp.Tests
         [TestMethod]
         public void testRoundTripConversion_LitreToGallonToLitre()
         {
-            var startingPoint = new Quantity<VolumeUnit>(10.0, VolumeUnit.Litre);
+            var startingPoint = new Quantity<VolumeUnit>(10.0, VolumeUnit.Litre, converter);
 
             Quantity<VolumeUnit> converted = startingPoint.ConvertTo(VolumeUnit.Gallon);
             Quantity<VolumeUnit> backAgain = converted.ConvertTo(VolumeUnit.Litre);

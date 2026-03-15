@@ -1,17 +1,13 @@
-namespace QuantityMeasurementApp.models
-{
-    public enum WeightUnit
-    {
-        Grams,
-        Kilograms,
-        Pound
-    }
+using ModelLayer.Interfaces;
+using ModelLayer.Enums;
 
+namespace BusinessLayer.Services
+{
     /// <summary>
     /// Helper methods for weight unit conversions.
     /// Base unit used internally is kilogram.
     /// </summary>
-    public static class WeightUnitExtension
+    public class WeightUnitConverter: IMeasurable<WeightUnit>
     {
         private static readonly double[] BaseFactors =
         {
@@ -20,22 +16,22 @@ namespace QuantityMeasurementApp.models
             0.453592
         };
 
-        public static double GetConversionFactor(this WeightUnit unit)
+        public double GetConversionFactor(WeightUnit unit)
         {
             return BaseFactors[(int)unit];
         }
 
-        public static double ConvertToBase(this WeightUnit unit, double amount)
+        public double ConvertToBase(WeightUnit unit, double amount)
         {
-            return amount * unit.GetConversionFactor();
+            return amount * GetConversionFactor(unit);
         }
 
-        public static double ConvertFromBase(this WeightUnit unit, double baseValue)
+        public double ConvertFromBase(WeightUnit unit, double baseValue)
         {
-            return baseValue / unit.GetConversionFactor();
+            return baseValue / GetConversionFactor(unit);
         }
 
-        public static string GetSymbol(this WeightUnit unit)
+        public string GetSymbol(WeightUnit unit)
         {
             switch (unit)
             {
