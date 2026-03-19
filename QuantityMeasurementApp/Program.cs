@@ -1,21 +1,18 @@
-﻿using QuantityMeasurementApp.Factories;
+﻿using QuantityMeasurementApp.Config;
+using QuantityMeasurementApp.Factories;
 using QuantityMeasurementApp.Interfaces;
+using RepoLayer.Database;
 
 namespace QuantityMeasurementApp
 {
-    /// <summary>
-    /// Entry point of the Quantity Measurement application.
-    /// Initializes required components using the factory pattern
-    /// and starts the application menu.
-    /// </summary>
     internal class Program
     {
-        /// <summary>
-        /// Application starting point. Creates the menu using MenuFactory
-        /// and runs the main application menu.
-        /// </summary>
         private static void Main(string[] args)
         {
+            string connectionString = AppConfig.GetConnectionString();
+
+            DatabaseInitializer.Initialize(connectionString);
+
             IMenuFactory factory = new MenuFactory();
 
             IQuantityMeasurementAppMenu menu = factory.CreateMenu();

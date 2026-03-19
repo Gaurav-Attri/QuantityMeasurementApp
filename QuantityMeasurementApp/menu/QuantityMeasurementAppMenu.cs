@@ -5,12 +5,15 @@ using ModelLayer.Interfaces;
 using ModelLayer.DTOs;
 using BusinessLayer.Services;
 using QuantityMeasurementApp.Interfaces;
+using QuantityMeasurementApp.Config;
+
 
 namespace QuantityMeasurementApp.Menu
 {
     public class QuantityMeasurementAppMenu : IQuantityMeasurementAppMenu
     {
-        private readonly QuantityMeasurementService measurementService = new QuantityMeasurementService();
+        private readonly QuantityMeasurementService measurementService =
+        new QuantityMeasurementService(AppConfig.GetConnectionString());
 
         private IUnitConverter<T> ResolveConverter<T>() where T : struct, Enum
         {
