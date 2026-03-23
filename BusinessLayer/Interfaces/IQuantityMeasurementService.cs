@@ -9,6 +9,11 @@ namespace BusinessLayer.Interfaces
     /// </summary>
     public interface IQuantityMeasurementService
     {
+        QuantityResultDto Add(AddRequestDto request);
+        QuantityResultDto Subtract(SubtractRequestDto request);
+        DivisionResultDto Divide(DivideRequestDto request);
+        ComparisonResultDto Compare(ComparisonRequestDto request);
+        QuantityResultDto Convert(ConversionRequestDto request);
         ComparisonResultDto Compare<U>(Quantity<U> firstQuantity, Quantity<U> secondQuantity)
             where U : struct, Enum;
 
@@ -27,7 +32,7 @@ namespace BusinessLayer.Interfaces
         QuantityResultDto Subtract<U>(Quantity<U> firstValue, Quantity<U> secondValue, U resultUnit)
             where U : struct, Enum;
 
-        DivisionResultDto Divide<T>(double firstValue, T firstUnit, double secondValue, T secondUnit)
+        DivisionResultDto Divide<T>(Quantity<T> dividend, Quantity<T> divisor)
             where T : struct, Enum;
     }
 }
