@@ -17,51 +17,51 @@ namespace BusinessLayer.Services
         {
             _context = context;
         }
-        public QuantityResultDto Add(AddRequestDto request)
+        public QuantityResultDto Add(AddRequestDto request, int userId)
         {
             switch (request.QuantityType)
             {
                 case "Length":
-                    return AddInternal<LengthUnit>(request);
+                    return AddInternal<LengthUnit>(request, userId);
                 case "Weight":
-                    return AddInternal<WeightUnit>(request);
+                    return AddInternal<WeightUnit>(request, userId);
                 case "Volume":
-                    return AddInternal<VolumeUnit>(request);
+                    return AddInternal<VolumeUnit>(request, userId);
                 case "Temperature":
-                    return AddInternal<TemperatureUnit>(request);
+                    return AddInternal<TemperatureUnit>(request, userId);
                 default:
                     throw new NotSupportedException("Invalid quantity type");
             }
         }
 
-        public QuantityResultDto AddInternal<T>(AddRequestDto request) where T : struct, Enum
+        public QuantityResultDto AddInternal<T>(AddRequestDto request, int userId) where T : struct, Enum
         {
             var converter = ResolveConverter<T>();
 
             var q1 = new Quantity<T>(request.Value1, Enum.Parse<T>(request.Unit1, true), converter);
             var q2 = new Quantity<T>(request.Value2, Enum.Parse<T>(request.Unit2, true), converter);
 
-            return DemonstrateAddition(q1, q2);
+            return DemonstrateAddition(q1, q2, userId);
         }
 
-        public QuantityResultDto Subtract(SubtractRequestDto request)
+        public QuantityResultDto Subtract(SubtractRequestDto request, int userId)
         {
             switch (request.QuantityType)
             {
                 case "Length":
-                    return SubtractInternal<LengthUnit>(request);
+                    return SubtractInternal<LengthUnit>(request, userId);
                 case "Weight":
-                    return SubtractInternal<WeightUnit>(request);
+                    return SubtractInternal<WeightUnit>(request, userId);
                 case "Volume":
-                    return SubtractInternal<VolumeUnit>(request);
+                    return SubtractInternal<VolumeUnit>(request, userId);
                 case "Temperature":
-                    return SubtractInternal<TemperatureUnit>(request);
+                    return SubtractInternal<TemperatureUnit>(request, userId);
                 default:
                     throw new NotSupportedException("Invalid quantity type");
             }
         }
 
-        public QuantityResultDto SubtractInternal<T>(SubtractRequestDto request) where T : struct, Enum
+        public QuantityResultDto SubtractInternal<T>(SubtractRequestDto request, int userId) where T : struct, Enum
         {
             var converter = ResolveConverter<T>();
 
@@ -69,54 +69,54 @@ namespace BusinessLayer.Services
             var q2 = new Quantity<T>(request.Value2, Enum.Parse<T>(request.Unit2, true), converter);
             var resultUnit = Enum.Parse<T>(request.ResultUnit);
 
-            return Subtract(q1, q2, resultUnit);
+            return Subtract(q1, q2, resultUnit, userId);
         }
 
-        public DivisionResultDto Divide(DivideRequestDto request)
+        public DivisionResultDto Divide(DivideRequestDto request, int userId)
         {
             switch (request.QuantityType)
             {
                 case "Length":
-                    return DivideInternal<LengthUnit>(request);
+                    return DivideInternal<LengthUnit>(request, userId);
                 case "Weight":
-                    return DivideInternal<WeightUnit>(request);
+                    return DivideInternal<WeightUnit>(request, userId);
                 case "Volume":
-                    return DivideInternal<VolumeUnit>(request);
+                    return DivideInternal<VolumeUnit>(request, userId);
                 case "Temperature":
-                    return DivideInternal<TemperatureUnit>(request);
+                    return DivideInternal<TemperatureUnit>(request, userId);
                 default:
                     throw new NotSupportedException("Invalid quantity type");
             }
         }
 
-        public DivisionResultDto DivideInternal<T>(DivideRequestDto request) where T : struct, Enum
+        public DivisionResultDto DivideInternal<T>(DivideRequestDto request, int userId) where T : struct, Enum
         {
             var converter = ResolveConverter<T>();
 
             var q1 = new Quantity<T>(request.Value1, Enum.Parse<T>(request.Unit1, true), converter);
             var q2 = new Quantity<T>(request.Value2, Enum.Parse<T>(request.Unit2, true), converter);
 
-            return Divide(q1, q2);
+            return Divide(q1, q2, userId);
         }
 
-        public QuantityResultDto Convert(ConversionRequestDto request)
+        public QuantityResultDto Convert(ConversionRequestDto request, int userId)
         {
             switch (request.QuantityType)
             {
                 case "Length":
-                    return ConvertInteral<LengthUnit>(request);
+                    return ConvertInteral<LengthUnit>(request, userId);
                 case "Weight":
-                    return ConvertInteral<WeightUnit>(request);
+                    return ConvertInteral<WeightUnit>(request, userId);
                 case "Volume":
-                    return ConvertInteral<VolumeUnit>(request);
+                    return ConvertInteral<VolumeUnit>(request, userId);
                 case "Temperature":
-                    return ConvertInteral<TemperatureUnit>(request);
+                    return ConvertInteral<TemperatureUnit>(request, userId);
                 default:
                     throw new NotSupportedException("Invalid quantity type");
             }
         }
 
-        public QuantityResultDto ConvertInteral<T>(ConversionRequestDto request) where T: struct, Enum
+        public QuantityResultDto ConvertInteral<T>(ConversionRequestDto request, int userId) where T: struct, Enum
         {
             var converter = ResolveConverter<T>();
 
@@ -124,34 +124,34 @@ namespace BusinessLayer.Services
 
             var desiredUnit = Enum.Parse<T>(request.TargetUnit);
 
-            return DemonstrateConversion(quantity, desiredUnit);
+            return DemonstrateConversion(quantity, desiredUnit, userId);
         }
 
-        public ComparisonResultDto Compare(ComparisonRequestDto request)
+        public ComparisonResultDto Compare(ComparisonRequestDto request, int userId)
         {
             switch (request.QuantityType)
             {
                 case "Length":
-                    return CompareInternal<LengthUnit>(request);
+                    return CompareInternal<LengthUnit>(request, userId);
                 case "Weight":
-                    return CompareInternal<WeightUnit>(request);
+                    return CompareInternal<WeightUnit>(request, userId);
                 case "Volume":
-                    return CompareInternal<VolumeUnit>(request);
+                    return CompareInternal<VolumeUnit>(request, userId);
                 case "Temperature":
-                    return CompareInternal<TemperatureUnit>(request);
+                    return CompareInternal<TemperatureUnit>(request, userId);
                 default:
                     throw new NotSupportedException("Invalid quantity type");
             }
         }
 
-        public ComparisonResultDto CompareInternal<T>(ComparisonRequestDto request) where T : struct, Enum
+        public ComparisonResultDto CompareInternal<T>(ComparisonRequestDto request, int userId) where T : struct, Enum
         {
             var converter = ResolveConverter<T>();
 
             var q1 = new Quantity<T>(request.Value1, Enum.Parse<T>(request.Unit1, true), converter);
             var q2 = new Quantity<T>(request.Value2, Enum.Parse<T>(request.Unit2, true), converter);
 
-            return Compare(q1, q2);
+            return Compare(q1, q2, userId);
         }
 
         private IUnitConverter<T> ResolveConverter<T>() where T : struct, Enum
@@ -180,12 +180,13 @@ namespace BusinessLayer.Services
             };
         }
 
-        public ComparisonResultDto Compare<U>(Quantity<U> firstQuantity, Quantity<U> secondQuantity) where U : struct, Enum
+        public ComparisonResultDto Compare<U>(Quantity<U> firstQuantity, Quantity<U> secondQuantity, int userId) where U : struct, Enum
         {
             var areEqual = firstQuantity.Equals(secondQuantity);
 
             var entity = new QuantityMeasurement
             {
+                UserId = userId,
                 Category = typeof(U).Name,
                 Operation = "Comparison",
                 Value1 = firstQuantity.Value,
@@ -206,12 +207,13 @@ namespace BusinessLayer.Services
             };
         }
 
-        public QuantityResultDto DemonstrateConversion<U>(Quantity<U> originalQuantity, U desiredUnit) where U : struct, Enum
+        public QuantityResultDto DemonstrateConversion<U>(Quantity<U> originalQuantity, U desiredUnit, int userId) where U : struct, Enum
         {
             var result = originalQuantity.ConvertTo(desiredUnit);
 
             var entity = new QuantityMeasurement
             {
+                UserId = userId,
                 Category = typeof(U).Name,
                 Operation = "Conversion",
                 Value1 = originalQuantity.Value,
@@ -229,12 +231,13 @@ namespace BusinessLayer.Services
             return MapQuantityToDto(result);
         }
 
-        public QuantityResultDto DemonstrateAddition<U>(Quantity<U> leftOperand, Quantity<U> rightOperand) where U : struct, Enum
+        public QuantityResultDto DemonstrateAddition<U>(Quantity<U> leftOperand, Quantity<U> rightOperand, int userId) where U : struct, Enum
         {
             var result = leftOperand.Add(rightOperand);
 
             var entity = new QuantityMeasurement
             {
+                UserId = userId,
                 Category = typeof(U).Name,
                 Operation = "Addition",
                 Value1 = leftOperand.Value,
@@ -252,12 +255,13 @@ namespace BusinessLayer.Services
             return MapQuantityToDto(result);
         }
 
-        public QuantityResultDto Subtract<U>(Quantity<U> firstValue, Quantity<U> secondValue, U resultUnit) where U : struct, Enum
+        public QuantityResultDto Subtract<U>(Quantity<U> firstValue, Quantity<U> secondValue, U resultUnit, int userId) where U : struct, Enum
         {
             var result = firstValue.Subtract(secondValue, resultUnit);
 
             var entity = new QuantityMeasurement
             {
+                UserId = userId,
                 Category = typeof(U).Name,
                 Operation = "Subtraction",
                 Value1 = firstValue.Value,
@@ -275,12 +279,13 @@ namespace BusinessLayer.Services
             return MapQuantityToDto(result);
         }
 
-        public DivisionResultDto Divide<T>(Quantity<T> dividend, Quantity<T> divisor) where T : struct, Enum
+        public DivisionResultDto Divide<T>(Quantity<T> dividend, Quantity<T> divisor, int userId) where T : struct, Enum
         {
             double result = dividend.Divide(divisor);
 
             var entity = new QuantityMeasurement
             {
+                UserId = userId,
                 Category = typeof(T).Name,
                 Operation = "Division",
                 Value1 = dividend.Value,
@@ -301,7 +306,7 @@ namespace BusinessLayer.Services
             };
         }
 
-        public QuantityResultDto DemonstrateConversion<U>(double numericValue, U sourceType, U targetType)
+        public QuantityResultDto DemonstrateConversion<U>(double numericValue, U sourceType, U targetType, int userId)
     where U : struct, Enum
         {
             var converter = ResolveConverter<U>();
@@ -312,6 +317,7 @@ namespace BusinessLayer.Services
 
             var entity = new QuantityMeasurement
             {
+                UserId = userId,
                 Category = typeof(U).Name,
                 Operation = "Conversion",
                 Value1 = numericValue,
@@ -329,13 +335,14 @@ namespace BusinessLayer.Services
             return MapQuantityToDto(converted);
         }
 
-        public QuantityResultDto DemonstrateAddition<U>(Quantity<U> leftOperand, Quantity<U> rightOperand, U resultUnit)
+        public QuantityResultDto DemonstrateAddition<U>(Quantity<U> leftOperand, Quantity<U> rightOperand, U resultUnit, int userId)
     where U : struct, Enum
         {
             Quantity<U> result = leftOperand.Add(rightOperand, resultUnit);
 
             var entity = new QuantityMeasurement
             {
+                UserId = userId,
                 Category = typeof(U).Name,
                 Operation = "Addition",
                 Value1 = leftOperand.Value,
@@ -351,6 +358,31 @@ namespace BusinessLayer.Services
             _context.SaveChanges();
 
             return MapQuantityToDto(result);
+        }
+    
+        public QuantityMeasurementHistoryDto GetMeasurmentsHistory(int userId)
+        {
+            var measurements = _context.QuantityMeasurements
+                               .Where(q => q.UserId == userId)
+                               .Select(q => new QuantityMeasurementDto
+                               {
+                                   Id = q.Id,
+                                   Category = q.Category,
+                                   Operation = q.Operation,
+                                   Value1 = q.Value1,
+                                   Unit1 = q.Unit1,
+                                   Value2 = q.Value2,
+                                   Unit2 = q.Unit2,
+                                   ResultValue = q.ResultValue,
+                                   ResultUnit = q.ResultUnit,
+                                   CreatedAt = q.CreatedAt
+                               })
+                               .ToList();
+
+            return new QuantityMeasurementHistoryDto
+            {
+                Measurements = measurements
+            };
         }
     }
 }

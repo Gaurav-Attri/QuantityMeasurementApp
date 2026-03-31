@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using ModelLayer.DTOs;
 using BusinessLayer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
-namespace WebApiLayer.QuantityMeasurementController
+namespace WebApiLayer.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("/api/quantitymeasurement")]
     public class QuantityMeasurementController : ControllerBase
@@ -20,7 +23,8 @@ namespace WebApiLayer.QuantityMeasurementController
         {
             try
             {
-                var result = _service.Add(request);
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var result = _service.Add(request, userId);
                 return Ok(result);
             }
             catch (Exception e)
@@ -35,7 +39,8 @@ namespace WebApiLayer.QuantityMeasurementController
         {
             try
             {
-                var result = _service.Subtract(request);
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var result = _service.Subtract(request, userId);
                 return Ok(result);
             }
             catch (Exception e)
@@ -50,7 +55,8 @@ namespace WebApiLayer.QuantityMeasurementController
         {
             try
             {
-                var result = _service.Divide(request);
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var result = _service.Divide(request, userId);
                 return Ok(result);
             }
             catch (Exception e)
@@ -65,7 +71,8 @@ namespace WebApiLayer.QuantityMeasurementController
         {
             try
             {
-                var result = _service.Compare(request);
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var result = _service.Compare(request, userId);
                 return Ok(result);
             }
             catch (Exception e)
@@ -80,7 +87,24 @@ namespace WebApiLayer.QuantityMeasurementController
         {
             try
             {
-                var result = _service.Convert(request);
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var result = _service.Convert(request, userId);
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                var msg = e.Message;
+                return BadRequest(msg);
+            }
+        }
+
+        [HttpPost("history")]
+        public IActionResult GetHistory()
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+                var result = _service.GetMeasurmentsHistory(userId);
                 return Ok(result);
             }
             catch (Exception e)

@@ -8,5 +8,6 @@ namespace DataAccessLayer.Data
         public AppDbContext(DbContextOptions<AppDbContext> options): base(options){}
         
         public DbSet<QuantityMeasurement> QuantityMeasurements {get; set;}
+        public DbSet<User> Users {get; set;}
     }
 }
